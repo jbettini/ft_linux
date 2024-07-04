@@ -26,7 +26,7 @@ git clone https://github.com/jbettini/ft_linux.git
 
 #### Host System Requirements
 
-1.  Dependencies
+#### 1.  Dependencies
 
 Verify the dependencies and install the missing package:
 ```
@@ -34,7 +34,7 @@ bash version-check.sh
 sudo apt-get install -y <missing package>
 ```
 
-2.  Creating a New Partition 
+####  2.  Creating a New Partition 
 
 To install LFS, create three partitions: main, swap, and boot, using cfdisk. Maybe u need to create a disk before as you want.
 -   Launch cfdisk:
@@ -50,7 +50,7 @@ Create Boot Partition (1M):
 Save and Quit:
 -   Write changes, confirm with yes, then "Quit"
 
-3.  Create File Systems
+#### 3.  Create File Systems
 
 Main Partition:
 ```
@@ -66,7 +66,7 @@ Boot Partition:
 mkfs -v -t ext2 /dev/sdb3
 ```
 
-4.  Set the Environment Variable
+#### 4.  Set the Environment Variable
 
 For Fish Shell:
 ```
