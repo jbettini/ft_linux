@@ -50,4 +50,37 @@ Create Boot Partition (1M):
 Save and Quit:
 -   Write changes, confirm with yes, then "Quit"
 
-3. 
+3.  Create File Systems
+
+Main Partition:
+```
+mkfs -v -t ext4 /dev/sdb1
+```
+SWAP Partition:
+```
+mkswap /dev/sdb2
+swapon -v /dev/sdb2
+```
+Boot Partition:
+```
+mkfs -v -t ext2 /dev/sdb3
+```
+
+4.  Set the Environment Variable
+
+For Fish Shell:
+```
+set -Ux LFS /mnt/lfs
+```
+For Bash Shell:
+```
+echo "export LFS=/mnt/lfs" >> ~/.bash_profile
+echo "export LFS=/mnt/lfs" >> ~/.bashrc
+source ~/.bashrc
+source ~/.bash_profile
+```
+Verify:
+```
+echo $LFS
+```
+Ensure it outputs /mnt/lfs.
