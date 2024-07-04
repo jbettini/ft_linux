@@ -41,7 +41,7 @@ To install LFS, create three partitions: main, swap, and boot, using cfdisk. May
 ```
 cfdisk /dev/<Your LFS disk>
 ```
-Create Main Partition (20GB):
+Create Partition :
 -   "New" → "Primary" → Size: 20G → Type: Linux
 Create Swap Partition (2GB):
 -   "New" → "Primary" → Size: 2G → Type: Linux swap / Solaris
