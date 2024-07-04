@@ -31,7 +31,7 @@ Verify the dependencies and install the missing package:
 bash version-check.sh
 sudo apt-get install -y <missing package>
 ```
-#### Creating a New Partition 
+1.  Creating a New Partition 
 
 To install LFS, create three partitions: main, swap, and boot, using cfdisk. Maybe u need to create a disk before as you want.
 -   Launch cfdisk:
@@ -46,3 +46,5 @@ Create Boot Partition (1M):
 -   "New" → "Primary" → Size: 1M → Type: BIOS boot
 Save and Quit:
 -   Write changes, confirm with yes, then "Quit"
+
+2. 
