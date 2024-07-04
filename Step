@@ -1,0 +1,74 @@
+Step 2 partionner les disque pour avoir 3 partions :
+
+Monter un disque vide
+
+une principal de 20GB               cfidisk new partion type linux
+une swap de 2GB                     cfidisk new partion type swap
+une bootloader 1M                   cfidisk new partion type boot
+
+--------------------------------------------------------
+
+Step 3  Cree les file systems
+
+pour la partition principal
+mkfs -v -t ext4 /dev/sdb1
+
+pour la partition SWAP
+mkswap /dev/sdb2 + swapon -v /dev/sdb2 
+
+pour la partition boot
+mkfs -v -t ext2 /dev/sdb3
+
+--------------------------------------------------------
+
+Step 4 Set l'env
+
+
+Pour fish :
+
+set -Ux LFS /mnt/lfs // pour chaque utilisateur
+
+Pour bash :
+
+echo "export LFS=/mnt/lfs" >> ~/.bash_profile
+echo "export LFS=/mnt/lfs" >> ~/.bashrc
+source ~/.bashrc
+source ~/.bash_profile
+
+
+
+--------------------------------------------------------
+
+Step 5 Monter les partition
+
+mkdir -pv $LFS
+
+pour la partition principal
+mount -v -t ext4 /dev/sdb1 $LFS
+
+pour la partition SWAP
+swapon -v /dev/sdb2 + si possible add dans /etc/fstab "/dev/sdb2        none   swap     0       0"
+
+pour la partition boot
+mkfs -v -t ext2 /dev/sdb3
+
+--------------------------------------------------------
+
+Step 
+
+--------------------------------------------------------
+
+Step 
+
+--------------------------------------------------------
+
+Step 
+--------------------------------------------------------
+
+Step 
+--------------------------------------------------------
+
+Step 
+--------------------------------------------------------
+
+Step 
