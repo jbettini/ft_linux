@@ -26,12 +26,15 @@ git clone https://github.com/jbettini/ft_linux.git
 
 #### Host System Requirements
 
+1.  Dependencies
+
 Verify the dependencies and install the missing package:
 ```
 bash version-check.sh
 sudo apt-get install -y <missing package>
 ```
-1.  Creating a New Partition 
+
+2.  Creating a New Partition 
 
 To install LFS, create three partitions: main, swap, and boot, using cfdisk. Maybe u need to create a disk before as you want.
 -   Launch cfdisk:
@@ -47,4 +50,4 @@ Create Boot Partition (1M):
 Save and Quit:
 -   Write changes, confirm with yes, then "Quit"
 
-2. 
+3. 
