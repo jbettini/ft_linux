@@ -26,6 +26,7 @@ git clone https://github.com/jbettini/ft_linux.git
 ```
 This repository contains essential files/scripts required for the installation and setup process.
 
+-----------------------------------
 #### Step 1 - Preparing the Host System 
 
 ##### 1.  Dependencies
@@ -106,6 +107,7 @@ Optionally, add to /etc/fstab:
 ```
 The boot partition is typically mounted later during the bootloader installation process. For now, ensure the main partition and swap are set up and ready for the LFS build.
 
+-----------------------------------
 #### Step 2 - Packages and Patches 
 
 ##### 1. Download Packages
