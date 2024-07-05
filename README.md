@@ -107,19 +107,20 @@ Optionally, add to /etc/fstab:
 ```
 The boot partition is typically mounted later during the bootloader installation process. For now, ensure the main partition and swap are set up and ready for the LFS build.
 
------------------------------------
-#### Step 2 - Packages and Patches 
-
-##### 1. Download Packages
+##### 6. Download Packages
 
 Create Sources Directory:
 ```
 mkdir -v $LFS/sources $LFS/patch
 chmod -v a+wt $LFS/sources $LFS/patch
 ```
-Download with wget, use the wget-list files present in the repository as inputfile, and check if everything is downloaded with check_dl_package:
+Copy the file md5sums in $LFS/sources. Download with wget, use the wget-list files present in the repository as inputfile, and check if everything is downloaded with check_dl_package:
 ```
 wget --input-file=wget-list-systemd --continue --directory-prefix=$LFS/sources;
 wget --input-file=wget-list-patch --continue --directory-prefix=$LFS/patch;
 bash check_dl_package.
+```
+Now just set the folders, with the build_folders.sh:
+```
+bash build_folder.sh 
 ```
