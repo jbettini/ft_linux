@@ -71,4 +71,10 @@ Step
 Step 
 --------------------------------------------------------
 
-Step 
+if (!path)
+    error
+if (!str)
+    error
+if (!str[c])
+    error
+do
