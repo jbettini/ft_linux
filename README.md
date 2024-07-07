@@ -30,6 +30,7 @@ When using a script, ensure you retrieve it from the appropriate directory. For 
 -----------------------------------
 ### I. Preparing the Host System
 
+-----------------------------------
 ##### 1.  Dependencies
 
 Verify the dependencies using the <version-check.sh> script inside the repository, and install missing package:
@@ -38,6 +39,7 @@ bash version-check.sh
 sudo apt-get install -y <missing package>
 ```
 
+-----------------------------------
 #####  2.  Creating a New Partition 
 
 To install LFS, create three partitions: main, swap, and boot, using cfdisk. Maybe u need to create a disk before, as you want.
@@ -54,6 +56,7 @@ Create Boot Partition (1M):
 Save and Quit:
 -   Write changes, confirm with yes, then "Quit"
 
+-----------------------------------
 ##### 3.  Create File Systems
 
 Main Partition:
@@ -68,7 +71,7 @@ Boot Partition:
 ```
 mkfs -v -t ext2 /dev/sdb3
 ```
-
+-----------------------------------
 ##### 4.  Set the Environment
 
 For Fish Shell:
@@ -88,6 +91,7 @@ echo $LFS
 ```
 Ensure it outputs /mnt/lfs.
 
+-----------------------------------
 ##### 5. Mount the Partitions
 
 Create Mount Point:
@@ -108,12 +112,13 @@ Optionally, add to /etc/fstab:
 ```
 The boot partition is typically mounted later during the bootloader installation process. For now, ensure the main partition and swap are set up and ready for the LFS build.
 
+-----------------------------------
 ##### 6. Download Packages
 
 Create Sources Directory:
 ```
-mkdir -v $LFS/sources $LFS/patch
-chmod -v a+wt $LFS/sources $LFS/patch
+mkdir -v $LFS/sources
+chmod -v a+wt $LFS/sources
 ```
 Copy the file md5sums in $LFS/sources. Download with wget, use the wget-list files present in the repository as inputfile, and check if everything is downloaded with check_dl_package:
 ```
@@ -126,7 +131,7 @@ Now just set the folders and the user lfs, execute these scripts:
 bash build_folder.sh;
 bash set_user.sh
 ```
-
+-----------------------------------
 ##### 7. Set LFS users env
 
 Connect to the user lfs and execute the script set_userLfs_env.sh
@@ -134,6 +139,7 @@ Connect to the user lfs and execute the script set_userLfs_env.sh
 su - lfs;
 bash set_userLfs_env.sh
 ```
+-----------------------------------
 
 ### II. Building LFS Cross-Tools and Temporary Tools
 
@@ -145,13 +151,18 @@ In this section, we will cover the construction of cross-compilation tools and t
 
 Before proceeding, it is highly recommended to understand how cross-compiling works, particularly the Canadian Cross model, which is a three-stage process to build cross-compilation tools. This knowledge is essential for troubleshooting and ensuring a successful build.
 
-###### 1. Important
+-----------------------------------
+##### 1. Important
 
 Follow this process unless otherwise instructed, Summary of the build process:
 
 Prepare Sources:
     Place all sources and patches in /mnt/lfs/sources/.
 
+Connect to the user lfs:
+```
+su - lfs
+```
 Navigate to Sources Directory:
 ```
 cd /mnt/lfs/sources
@@ -160,12 +171,13 @@ For Each Package:
 
 -   Extract using tar:
 ```
-tar -xf package-name.tar.xz
-````
+tar xvf package-name.tar.xz
+```
 -   For the Build, Follow package-specific instructions.
 -   Clean Up:
 ```
 rm -rf package-name
 ```
 
-
+-----------------------------------
+##### 2. 
