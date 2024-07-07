@@ -17,17 +17,18 @@ ft_linux is a project aimed at building a minimal Linux distribution from scratc
 
 ##  Walkthrough
 
-### I.  Preparing for the Build 
+### Installation 
 
-#### Installation 
 Clone the repository:
 ```
 git clone https://github.com/jbettini/ft_linux.git
 ```
 This repository contains essential files/scripts required for the installation and setup process.
 
+When using a script, ensure you retrieve it from the appropriate directory. For example, if you are reading Part-<current-part>.
+
 -----------------------------------
-#### Step 1 - Preparing the Host System 
+### I. Preparing the Host System
 
 ##### 1.  Dependencies
 
@@ -117,10 +118,54 @@ chmod -v a+wt $LFS/sources $LFS/patch
 Copy the file md5sums in $LFS/sources. Download with wget, use the wget-list files present in the repository as inputfile, and check if everything is downloaded with check_dl_package:
 ```
 wget --input-file=wget-list-systemd --continue --directory-prefix=$LFS/sources;
-wget --input-file=wget-list-patch --continue --directory-prefix=$LFS/patch;
+wget --input-file=wget-list-patch --continue --directory-prefix=$LFS/sources;
 bash check_dl_package.
 ```
-Now just set the folders, with the build_folders.sh:
+Now just set the folders and the user lfs, execute these scripts:
 ```
-bash build_folder.sh 
+bash build_folder.sh;
+bash set_user.sh
 ```
+
+##### 7. Set LFS users env
+
+Connect to the user lfs and execute the script set_userLfs_env.sh
+```
+su - lfs;
+bash set_userLfs_env.sh
+```
+
+### II. Building LFS Cross-Tools and Temporary Tools
+
+##### Intro
+
+In this section, we will cover the construction of cross-compilation tools and temporary tools necessary for building a Linux From Scratch (LFS) system. These tools are built in a controlled environment to ensure that the LFS system is built in a consistent and reproducible manner.
+
+##### Understanding Cross Compiling
+
+Before proceeding, it is highly recommended to understand how cross-compiling works, particularly the Canadian Cross model, which is a three-stage process to build cross-compilation tools. This knowledge is essential for troubleshooting and ensuring a successful build.
+
+###### 1. Important
+
+Follow this process unless otherwise instructed, Summary of the build process:
+
+Prepare Sources:
+    Place all sources and patches in /mnt/lfs/sources/.
+
+Navigate to Sources Directory:
+```
+cd /mnt/lfs/sources
+```
+For Each Package:
+
+-   Extract using tar:
+```
+tar -xf package-name.tar.xz
+````
+-   For the Build, Follow package-specific instructions.
+-   Clean Up:
+```
+rm -rf package-name
+```
+
+
