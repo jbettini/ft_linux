@@ -40,6 +40,7 @@ pushd binutils-2.42
         make install
     popd
 popd
+rm -rf binutils-2.42
 
 ##################gcc-13.2.0 PASS1##################
 
@@ -103,7 +104,9 @@ rm -rf linux-6.7.4
 
 ##################Glibc-2.39 PASS1##################
 
-pushdg glibc-2.39
+tar xvf glibc-2.39.tar.xz
+
+pushd glibc-2.39
     case $(uname -m) in
         i?86)   ln -sfv ld-linux.so.2 $LFS/lib/ld-lsb.so.3
         ;;
@@ -142,10 +145,10 @@ pushdg glibc-2.39
 popd
 rm -rf glibc-2.39
 
-##################Libstdc++ of GCC-13.2.0##################
+#################Libstdc++ of GCC-13.2.0##################
 
 pushd gcc-13.2.0
-    mkdir -v build
+    rm -rf build/*
     pushd build
         ../libstdc++-v3/configure           \
             --host=$LFS_TGT                 \
@@ -160,4 +163,5 @@ pushd gcc-13.2.0
         rm -v $LFS/usr/lib/lib{stdc++{,exp,fs},supc++}.la
     popd
 popd
-rm -rf
+rm -rf gcc-13.2.0
+

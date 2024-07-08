@@ -23,7 +23,7 @@ if [ $dir != "/mnt/lfs/sources" ]; then
 fi
 
 
-##################M4-1.4.19##################
+#################M4-1.4.19##################
 
 tar xvf m4-1.4.19.tar.xz
 
@@ -87,7 +87,7 @@ rm -rf bash-5.2.21
 
 tar xvf coreutils-9.4.tar.xz
 
-pushd coreutils-9.4.tar.gz
+pushd coreutils-9.4
     ./configure --prefix=/usr                     \
                 --host=$LFS_TGT                   \
                 --build=$(build-aux/config.guess) \
@@ -257,6 +257,8 @@ rm -rf xz-5.4.6
 
 ##################Binutils-2.42 — Passe 2##################
 
+tar xvf  binutils-2.42.tar.xz
+
 pushd binutils-2.42
     sed '6009s/$add_dir//' -i ltmain.sh
     rm -rf build
@@ -280,6 +282,8 @@ popd
 rm -rf binutils-2.42
 
 ##################GCC-13.2.0 — Passe 2##################
+
+tar xvf  gcc-13.2.0.tar.xz
 
 pushd gcc-13.2.0
     tar -xf ../mpfr-4.2.1.tar.xz
