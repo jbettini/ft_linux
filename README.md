@@ -152,32 +152,39 @@ In this section, we will cover the construction of cross-compilation tools and t
 Before proceeding, it is highly recommended to understand how cross-compiling works, particularly the Canadian Cross model, which is a three-stage process to build cross-compilation tools. This knowledge is essential for troubleshooting and ensuring a successful build.
 
 -----------------------------------
-##### 1. Important
+##### 1. How Scripts Work
 
-Follow this process unless otherwise instructed, Summary of the build process:
-
+Follow this process unless otherwise instructed. Summary of the build process:
 Prepare Sources:
-    Place all sources and patches in /mnt/lfs/sources/.
-
+-   Place all sources and patches in /mnt/lfs/sources/.
 Connect to the user lfs:
 ```
 su - lfs
 ```
-Navigate to Sources Directory:
+Navigate to the Sources Directory:
 ```
 cd /mnt/lfs/sources
 ```
 For Each Package:
-
 -   Extract using tar:
 ```
 tar xvf package-name.tar.xz
 ```
--   For the Build, Follow package-specific instructions.
--   Clean Up:
+-   Use pushd to enter the extracted package directory.
+-   Build the package with the specific instructions from LFS.
+-   Use popd to return to /mnt/lfs/sources.
+-   Clean up:
 ```
 rm -rf package-name
 ```
+##### 2. Compiling and Building Cross Tools
 
------------------------------------
-##### 2. 
+For this part, just execute the first script and wait:
+```
+sh cross_pk1.sh
+```
+If something occurs, check if you missed something before. Otherwise, just execute the second script and wait:
+```
+sh cross_pk2.sh
+```
+
