@@ -224,6 +224,13 @@ bash    giveRightToRoot.sh
 ```
 bash mountChroot.sh
 ```
+-   Configure /dev/null :
+```
+sudo rm -f /mnt/lfs/dev/null
+sudo mknod -m 666 /mnt/lfs/dev/null c 1 3
+ls -l /mnt/lfs/dev/null
+```
+
 -   Enter in chroot environnement :
 ```
 bash enterInChroot.sh
@@ -384,5 +391,4 @@ tar -xpf $HOME/lfs-temp-tools-12.1-systemd.tar.xz
 
 In this chapter, we begin the actual construction of the LFS system. We are now at the final stage of project. Although installation instructions could often be shorter and more generic, we provide complete instructions for each package to minimize errors.
 
-
-
+##### 1. 

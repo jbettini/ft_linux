@@ -11,7 +11,7 @@ trap 'handle_error $LINENO' ERR
 
 cd /sources
 
-##################Gettext-0.22.4##################
+#################Gettext-0.22.4##################
 
 tar xvf gettext-0.22.4.tar.xz
 
@@ -113,3 +113,4 @@ rm -rf util-linux-2.39.3
 rm -rf /usr/share/{info,man,doc}/*
 find /usr/{lib,libexec} -name \*.la -delete
 rm -rf /tools
+
