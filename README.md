@@ -391,4 +391,21 @@ tar -xpf $HOME/lfs-temp-tools-12.1-systemd.tar.xz
 
 In this chapter, we begin the actual construction of the LFS system. We are now at the final stage of project. Although installation instructions could often be shorter and more generic, we provide complete instructions for each package to minimize errors.
 
-##### 1. 
+##### 1. Installation of all packages
+
+-   First connect to root, and copy the script package.sh inside chroot:
+```
+su -
+cp -f package.sh /mnt/lfs/.
+```
+
+-   Then enter in chroot:
+```
+sh enterInChroot.sh
+```
+-   Start the package installation script:
+```
+bash package.sh
+```
+
+
