@@ -391,14 +391,16 @@ tar -xpf $HOME/lfs-temp-tools-12.1-systemd.tar.xz
 
 In this chapter, we begin the actual construction of the LFS system. We are now at the final stage of project. Although installation instructions could often be shorter and more generic, we provide complete instructions for each package to minimize errors.
 
-##### 1. Installation of all packages
+#### Installation of all packages
+
+Before starting, each scripts takes a very long time to complete, if u have an error during the execution, just check the line where the script stop comment all package before, and do it manually, if even with this the package installation fail, check if u dont miss a step before, lets start :
 
 -   First connect to root, and copy the script package.sh inside chroot:
 ```
 su -
 cp -f package.sh /mnt/lfs/.
+cp -f package2.sh /mnt/lfs/.
 ```
-
 -   Then enter in chroot:
 ```
 sh enterInChroot.sh
@@ -408,4 +410,21 @@ sh enterInChroot.sh
 bash package.sh
 ```
 
+-   At this step we have bash installed lets use it :
+```
+exec /usr/bin/bash
+bash package2.sh
+```
+
+-   Now it is optinoal but you can execute the "cleanup.sh" script, if you choose to do this be sure to save before, check the chapter II - 4a to know how to save the current state of your LFS system:
+```
+exit
+cp -f cleanup.sh /mnt/lfs/.
+sh enterInChroot.sh
+bash cleanup.sh
+```
+
+### IV. Last settings
+
+#### 1. Network interface configuration
 
