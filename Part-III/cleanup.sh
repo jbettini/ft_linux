@@ -61,3 +61,27 @@ rm -rf /tmp/*
 find /usr/lib /usr/libexec -name \*.la -delete
 find /usr -depth -name $(uname -m)-lfs-linux-gnu\* | xargs rm -rf
 userdel -r tester
+<<<<<<< HEAD:Part-III/cleanup.sh
+=======
+
+
+
+
+SEARCH_DIR(/usr/x86_64-pc-linux-gnu/lib64)
+SEARCH_DIR(/usr/local/lib64)
+SEARCH_DIR(/lib64)
+SEARCH_DIR(/usr/lib64)
+SEARCH_DIR(/usr/x86_64-pc-linux-gnu/lib)
+SEARCH_DIR(/usr/local/lib)
+SEARCH_DIR(/lib)
+SEARCH_DIR(/usr/lib);
+
+SEARCH_DIR("/usr/x86_64-pc-linux-gnu/lib64")
+SEARCH_DIR("/usr/local/lib64")
+SEARCH_DIR("/lib64")
+SEARCH_DIR("/usr/lib64")
+SEARCH_DIR("/usr/x86_64-pc-linux-gnu/lib")
+SEARCH_DIR("/usr/local/lib")
+SEARCH_DIR("/lib")
+SEARCH_DIR("/usr/lib");
+>>>>>>> 6660ece (edit scripts):cleanup.sh
