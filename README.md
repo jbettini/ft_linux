@@ -75,7 +75,7 @@ Save and Quit:
 
 Main Partition:
 ```
-mkfs -v -t ext4 /dev/sdb1
+0
 ```
 SWAP Partition:
 ```
