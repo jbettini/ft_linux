@@ -99,7 +99,7 @@ menuentry 'Linux From Scratch' {
 EOF
 ---
 
-cat > /boot/grub/grub.cfg << "EOF"
+cat > /boot/grub/grub.cfg << "EOFose
 # Début de /boot/grub/grub.cfg
 set default=0
 set timeout=5
@@ -113,7 +113,6 @@ menuentry 'Linux From Scratch' {
         linux (hd0,1)/vmlinuz-6.7.4-jbettini root=/dev/sda2 ro net,ifnames=0 quiet debug init=/sbin/init
 }
 EOF
-
 
 ----------------------------
 
