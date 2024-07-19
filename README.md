@@ -29,7 +29,7 @@ French Version :
 http://fr.linuxfromscratch.org/view/lfs-systemd-stable/index.html
 ```
 
-It is highly recommended to do this project in a Virtual Machine with a minimum of 4 cores and 50GB of disk space. Taking a snapshot is an easy way to save your progress throughout the project.
+It is highly recommended to do this project in a Virtual Machine with the same CPU as the PC that will submit the project and 50GB of disk space. Taking a snapshot is an easy way to save your progress throughout the project.
 
 ### Installation 
 
@@ -54,36 +54,50 @@ sudo apt-get install -y <missing package>
 ```
 
 -----------------------------------
-#####  2.  Creating a New Partition 
+#####  2.  Creating a Disk image and Partition
+
+First we need to create an iso :
+```
+dd if=/dev/zero of=lfs.iso bs=1M count=20480 status=progress
+```
 
 To install LFS, create three partitions: main, swap, and boot, using cfdisk. Maybe u need to create a disk before, as you want.
 -   Launch cfdisk:
 ```
-cfdisk /dev/<Your LFS disk>
+cfdisk /path/to/your/iso
 ```
-Create Partition :
--   "New" → "Primary" → Size: 20G → Type: Linux
-Create Swap Partition (2GB):
--   "New" → "Primary" → Size: 2G → Type: Linux swap / Solaris
-Create Boot Partition (1M):
--   "New" → "Primary" → Size: 1M → Type: BIOS boot
-Save and Quit:
--   Write changes, confirm with yes, then "Quit"
+Select DOS:
+    Create Partition :
+        -   "New" → "Primary" → Size: 20G → Type: Linux
+        Create Swap Partition (2GB):
+        -   "New" → "Primary" → Size: 2G → Type: Linux swap / Solaris
+        Create Boot Partition (1M):
+        -   "New" → "Primary" → Size: 1M → Type: BIOS boot → Select Bootable
+        Save and Quit:
+        -   Write changes, confirm with yes, then "Quit"
+
+Configure your ISO image as a loop device and access its partitions, use the following command:
+```
+losetup --partscan --find --show lfs.iso
+```
+
 
 -----------------------------------
 ##### 3.  Create File Systems
 
-Main Partition:
-```
-0
-```
-SWAP Partition:
-```
-mkswap /dev/sdb2
-```
 Boot Partition:
 ```
-mkfs -v -t ext2 /dev/sdb3
+mkfs -v -t ext4 /dev/loop0p1
+```
+
+Main Partition:
+```
+mkfs -v -t ext4 /dev/loop0p2
+```
+
+SWAP Partition:
+```
+mkswap    /dev/loop0p3
 ```
 -----------------------------------
 ##### 4.  Set the Environment
@@ -114,15 +128,20 @@ mkdir -pv $LFS
 ```
 Mount Main Partition:
 ```
-mount -v -t ext4 /dev/sdb1 $LFS
+mount -v -t ext4 /dev/loop0p2 $LFS
 ```
 Enable Swap Partition:
 ```
-swapon -v /dev/sdb2
+swapon -v /dev/loop0p3
 ```
-Optionally, add to /etc/fstab:
+Add to /etc/fstab
 ```
-/dev/sdb2        none   swap     0       0
+/dev/loop0p2            /mnt/lfs        ext4            defaults        1       1
+/dev/loop0p3            none            swap            sw              0       0
+```
+And reload your systemd :
+```
+systemctl daemon-reload
 ```
 The boot partition is typically mounted later during the bootloader installation process. For now, ensure the main partition and swap are set up and ready for the LFS build.
 
@@ -262,14 +281,12 @@ EOF
 
 ```
 ln -sv /proc/self/mounts /etc/mtab
-```
-```
+
 cat > /etc/hosts << EOF
 127.0.0.1  localhost $(hostname)
 ::1        localhost
 EOF
-```
-```
+
 cat > /etc/passwd << "EOF"
 root:x:0:0:root:/root:/bin/bash
 bin:x:1:1:bin:/dev/null:/usr/bin/false
@@ -286,8 +303,7 @@ uuidd:x:80:80:UUID Generation Daemon User:/dev/null:/usr/bin/false
 systemd-oom:x:81:81:systemd Out Of Memory Daemon:/:/usr/bin/false
 nobody:x:65534:65534:Unprivileged User:/dev/null:/usr/bin/false
 EOF
-```
-```
+
 cat > /etc/group << "EOF"
 root:x:0:
 bin:x:1:daemon
@@ -323,14 +339,12 @@ wheel:x:97:
 users:x:999:
 nogroup:x:65534:
 EOF
-```
-```
+
 echo "tester:x:101:101::/home/tester:/bin/bash" >> /etc/passwd
 echo "tester:x:101:" >> /etc/group
 install -o tester -d /home/tester
 exec /usr/bin/bash --login
-```
-```
+
 touch /var/log/{btmp,lastlog,faillog,wtmp}
 chgrp -v utmp /var/log/lastlog
 chmod -v 664  /var/log/lastlog
@@ -426,5 +440,165 @@ bash cleanup.sh
 
 ### IV. Last settings
 
-#### 1. Network interface configuration
+#### 1. Set boot partition
 
+-   First we need to mount our /boot partition :
+
+```
+mount /dev/loop0p1 /mnt/lfs/boot
+```
+-   Edit /etc/fstab, add this :
+```
+/dev/loop0p1            /mnt/lfs/boot   ext4            defaults        0       0
+```
+-   Reload systemd :
+```
+systemctl daemon-reload
+```
+
+#### 2. Compile Linux
+
+-   Now we need to compile the linux kernel :
+```
+cd /sources
+tar xvf linux-6.7.4.tar.xz && cd linux-6.7.4
+```
+-   Follow this steps to configure linux settings :
+```
+https://www.linuxfromscratch.org/lfs/view/systemd/chapter10/kernel.html
+```
+-   When linux is compiled use this commands:
+```
+cp -iv arch/x86/boot/bzImage /boot/vmlinuz-6.7.4
+cp -iv System.map /boot/System.map-6.7.4
+cp -iv .config /boot/config-6.7.4
+cp -r Documentation -T /usr/share/doc/linux-6.7.4
+```
+
+#### 3. Configure Boot Loader
+
+-   Mount all partition, and enter in chroot :
+```
+bash mount.sh
+bash enterInChroot.sh
+```
+
+-   Ensure your /etc/fstab looks like this to properly mount file systems: :
+```
+# Begin /etc/fstab
+
+# file system           mount-point             type            options             dump  fsck
+#                                                                                               order
+
+/dev/loop0p1            /boot                   ext4            defaults            0     0
+/dev/loop0p2            /                       ext4            defaults            1     1
+/dev/loop0p3            swap                    swap            pri=1               0     0
+
+proc                    /proc                   proc            nosuid,noexec,nodev 0     0
+sysfs                   /sys                    sysfs           nosuid,noexec,nodev 0     0
+devpts                  /dev/pts                devpts          gid=5,mode=620      0     0
+tmpfs                   /run                    tmpfs           defaults            0     0
+devtmpfs                /dev                    devtmpfs        mode=0755,nosuid    0     0
+tmpfs                   /dev/shm                tmpfs           nosuid,nodev        0     0
+cgroup2                 /sys/fs/cgroup          cgroup2         nosuid,noexec,nodev 0     0
+
+# End /etc/fstab
+```
+
+-   Install grub :
+```
+grub-install /dev/loop0
+```
+-   Configure Grub :
+```
+cat > /boot/grub/grub.cfg << "EOF"
+set default=0
+set timeout=5
+
+insmod part_msdos
+insmod ext2
+
+set root=(hd0,msdos1)
+
+menuentry 'Linux From Scratch' {
+    linux (hd0,msdos1)/vmlinuz-6.7.4 root=/dev/loop0p2 ro quiet
+}
+EOF
+```
+
+#### 3b. Recommendation, more package before Boot
+
+-   We recommend downloading a few additional packages and their dependencies before booting the system. 
+```
+make-ca 1.14 
+curl 8.6.0     
+dhcpcd 10.0.8      
+gnutls 3.8.6  
+openssh
+```
+-   Check in BLS to have all dependencies and link :
+```
+https://www.linuxfromscratch.org/blfs/view/svn/
+```
+
+#### 4. Booting and network settings
+
+First if u are in a Virtual Machine you need to get your iso inside your host, we recommend to use scp using openssh.
+
+-   To boot, just edit the path of your iso on the script and execute it:
+```
+bash start_macOS
+
+    OR
+
+bash start_linux
+```
+
+-   Now if everything is ok, we need to configure internet follow this instruction :
+
+-   Get the internet interface :
+```
+ip link
+1: lo: <LOOPBACK,UP,LOWER_UP> mtu 65536 qdisc noqueue state UNKNOWN mode DEFAULT group default qlen 1000
+    link/loopback 00:00:00:00:00:00 brd 00:00:00:00:00:00
+2: enp0s2: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc pfifo_fast state UP mode DEFAULT group default qlen 1000
+    link/ether 52:54:00:12:34:56 brd ff:ff:ff:ff:ff:ff
+3: sit0@NONE: <NOARP> mtu 1480 qdisc noop state DOWN mode DEFAULT group default qlen 1000
+    link/sit 0.0.0.0 brd 0.0.0.0
+```
+Is maybe something like eth0 or enp0s2.
+
+-   Create the file :
+```
+cat > /etc/systemd/network/<interface name>.network << EOF
+[Match]
+Name=<interface name>
+
+[Network]
+DHCP=yes
+
+[DHCPv4]
+UseDomains=true
+EOF
+```
+-   Enable the necessary services:
+```
+systemctl enable systemd-networkd
+systemctl enable systemd-resolved
+```
+-   Create the symbolic link for DNS resolution:
+```
+ln -sf /run/systemd/resolve/stub-resolv.conf /etc/resolv.conf
+```
+-   Start the services:
+```
+systemctl start systemd-networkd
+systemctl start systemd-resolved
+```
+
+### V. Appendices 
+
+By following this guide, you have built a minimal Linux system using LFS. To further enhance your system, refer to the BLFS book for additional packages and configurations.
+
+If you need to download packages, use curl or wget. If these are unavailable, mount the ISO and download packages on a host system. Enter inside chroot, extract the archives, cd to the extracted directory, follow the BLFS instructions, and then delete the directory to keep your system clean. This will ensure a comprehensive and fully functional Linux environment.
+Happy building!
