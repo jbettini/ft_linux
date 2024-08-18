@@ -1,0 +1,30 @@
+#!/bin/bash
+qemu-system-x86_64                  \
+	-m 8G                           \
+	-cpu qemu64,+ssse3,+sse4.1,+sse4.2,+x2apic                   \
+	--enable-kvm                    \
+	-net user,hostfwd=tcp::2222-:4242 \
+	-net nic                        \
+	-hda "/home/jbettini/sgoinfre/lfs.iso"
+
+
+qemu-system-x86_64 \
+  -m 4G \
+  -cpu host,migratable=off \
+  -enable-kvm \
+  -smp 4,cores=4,threads=1,sockets=1 \
+  -machine type=q35 \
+  -cpu Skylake-Client,+pdpe1gb,+rdtscp,+fma,+pcid,+sse4_1,+sse4_2,+movbe,+popcnt,+aes,+xsave,+avx,+f16c,+rdrand,+hypervisor,+lahf_lm,+abm,+3dnowprefetch,+pti,+fsgsbase,+bmi1,+avx2,+smep,+bmi2,+erms,+rdseed,+adx,+smap,+clflushopt,+xsaveopt,+xgetbv1,+arat \
+  -drive file=your_image.qcow2,format=qcow2
+
+  #!/bin/bash
+qemu-system-x86_64                  \
+    -m 4G                            \  # Ajusté à 4 Go de RAM
+    -cpu host,migratable=off         \  # Utilisation du CPU de l'hôte
+    -smp 4,cores=4,threads=1,sockets=1 \  # 4 cœurs, 1 thread par cœur, 1 socket
+    --enable-kvm                     \
+    -net user,hostfwd=tcp::2222-:4242 \
+    -net nic                         \
+    -hda "/home/jbettini/sgoinfre/lfs.iso" \
+    -machine type=q35               \  # Type de machine q35
+    -cpu Skylake-Client,+pdpe1gb,+rdtscp,+fma,+pcid,+sse4_1,+sse4_2,+movbe,+popcnt,+aes,+xsave,+avx,+f16c,+rdrand,+hypervisor,+lahf_lm,+abm,+3dnowprefetch,+pti,+fsgsbase,+bmi1,+avx2,+smep,+bmi2,+erms,+rdseed,+adx,+smap,+clflushopt,+xsaveopt,+xgetbv1,+arat

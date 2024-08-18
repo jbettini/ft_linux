@@ -29,5 +29,4 @@ cp -rf ./Utils ./Workdir/.
 cp -rf ./Part-I/* ./Workdir/.
 cp -rf ./Part-II/* ./Workdir/.
 cp -rf ./Part-III/* ./Workdir/.
-cp -rf ./Part-IV/* ./Workdir/.
 
