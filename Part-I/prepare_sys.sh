@@ -317,6 +317,6 @@ EOF
 cat >> ~/.bashrc << "EOF"
 export MAKEFLAGS=-j$(nproc)
 EOF
-cp -f ../Part-II/install_cross_tools.sh /home/lfs/.
+cp -f ./install_cross_tools.sh /home/lfs/.
 
 print_color "$TXT_GREEN" "Setup Complete. Follow the manual for further instructions."

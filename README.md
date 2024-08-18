@@ -35,7 +35,9 @@ It is highly recommended to do this project in a Virtual Machine with the same C
 
 Clone the repository:
 ```
-git clone https://github.com/jbettini/ft_linux.git
+git clone https://github.com/jbettini/Ft_linux.git
+cd Ft_linux
+bash make_workdir.sh
 ```
 This repository contains essential files/scripts required for the installation and setup process.
 

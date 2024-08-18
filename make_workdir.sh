@@ -30,3 +30,4 @@ cp -rf ./Part-I/* ./Workdir/.
 cp -rf ./Part-II/* ./Workdir/.
 cp -rf ./Part-III/* ./Workdir/.
 
+cd Workdir
