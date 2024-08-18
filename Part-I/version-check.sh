@@ -88,4 +88,3 @@ if [ "$(nproc)" = "" ]; then
 else
    echo "OK : nproc rapporte $(nproc) cœurs logiques disponibles"
 fi
-EOF

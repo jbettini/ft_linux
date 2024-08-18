@@ -206,8 +206,8 @@ What the Script Does:
 If u are using a virtual machine just restore from a snapshot, if u follow the instruction in II.4a chapter just do this:
 
 ```
+rm -rf $LFS/*
 cd $LFS
-rm -rf ./*
 tar -xpf $HOME/backup_lfs_systemd.tar.xz
 ```
 ### III. Building the LFS System
