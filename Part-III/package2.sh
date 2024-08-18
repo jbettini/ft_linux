@@ -1,414 +1,381 @@
 #!/bin/bash
 
-# bash /package.sh
+TXT_RED="\033[1;31m"
+TXT_GREEN="\033[1;32m"
+TXT_YELLOW="\033[1;33m"
+TXT_BLUE="\033[1;34m"
+FANCY_RESET="\033[0m"
 
-set -eu
+print_color () {
+    echo -e "$1$2$FANCY_RESET"
+}
+
+user=$(whoami)
+
+if [ $user != "root" ]; then 
+    echo -e "Please, Load this script with root\n"
+    exit 1
+fi
 
 handle_error() {
-    echo "Error: line $1"
+    print_color "$TXT_RED" "Error: line $1"
     exit 1
 }
 
 trap 'handle_error $LINENO' ERR
 
+set -eu
+
 cd /sources
 
-run_make_check() {
-    set +e 
-    $1
-    # $1 2>&1 | tee check-log
-    # make check 2>&1 | tee check-log
-    set -e
-    # total_success=$(($(grep -c 'SUCESS' check-log) + $(grep -c 'PASS' check-log) + $(grep -c 'pass' check-log) + $(grep -c 'sucess' check-log)))
-    # total_FAIL=$(($(grep -c 'FAIL' check-log) + $(grep -c 'FAILED' check-log) + $(grep -c 'FAILLURE' check-log)))
-    # total_fail=$(($(grep -c 'fail' check-log) + $(grep -c 'failed' check-log) + $(grep -c 'faillure' check-log)))
-    # total_fails=$(total_fail + total_FAIL)
-
-    # total_success=${total_succ:-0}
-    # total_fails=${total_fail:-0}
-
-    # total_tests=$(total_fails + total_success)
-    # ratio_fail=$(total_fails * 100 / total_tests)
-    # if [ $ratio_fail -gt 7 ]; then
-    #     echo "Check failed"
-    #     exit 1
-    # else 
-    #     echo -e "CHECK IS PASS WITH SUCESS\n"
-    # fi
-}
 
 ###############Libtool-2.4.7.tar.xz##################
 
-tar xvf libtool-2.4.7.tar.xz
+# tar xvf libtool-2.4.7.tar.xz
 
-pushd libtool-2.4.7
-    ./configure --prefix=/usr
-    make
-    # run_make_check "make -k check"
-    make install
-    rm -fv /usr/lib/libltdl.a
-popd
+# pushd libtool-2.4.7
+#     ./configure --prefix=/usr
+#     make
+#     make install
+#     rm -fv /usr/lib/libltdl.a
+# popd
 
-rm -rf libtool-2.4.7
+# rm -rf libtool-2.4.7
 
-#################Gdbm-1.23.tar.gz##################
+# #################Gdbm-1.23.tar.gz##################
 
-tar xvf gdbm-1.23.tar.gz
+# tar xvf gdbm-1.23.tar.gz
 
-pushd gdbm-1.23
-    ./configure --prefix=/usr    \
-            --disable-static \
-            --enable-libgdbm-compat
-    make
-    # run_make_check "make -k check"
-    make install
-popd
+# pushd gdbm-1.23
+#     ./configure --prefix=/usr    \
+#             --disable-static \
+#             --enable-libgdbm-compat
+#     make
+#     make install
+# popd
 
-rm -rf gdbm-1.23
+# rm -rf gdbm-1.23
 
-#################gperf-3.1.tar.gz##################
+# #################gperf-3.1.tar.gz##################
 
-tar xvf gperf-3.1.tar.gz
+# tar xvf gperf-3.1.tar.gz
 
-pushd gperf-3.1
-    ./configure --prefix=/usr --docdir=/usr/share/doc/gperf-3.1
-    make
-    # run_make_check "make -k -j1 check"
-    make install
-popd
+# pushd gperf-3.1
+#     ./configure --prefix=/usr --docdir=/usr/share/doc/gperf-3.1
+#     make
+#     make install
+# popd
 
-rm -rf gperf-3.1
+# rm -rf gperf-3.1
 
-#################Expat-2.6.0##################
+# #################Expat-2.6.0##################
 
-tar xvf expat-2.6.0.tar.xz
+# tar xvf expat-2.6.0.tar.xz
 
-pushd expat-2.6.0
-    ./configure --prefix=/usr    \
-            --disable-static \
-            --docdir=/usr/share/doc/expat-2.6.0
-    make
-    # run_make_check "make check"
-    make install
-    install -v -m644 doc/*.{html,css} /usr/share/doc/expat-2.6.0
-popd
+# pushd expat-2.6.0
+#     ./configure --prefix=/usr    \
+#             --disable-static \
+#             --docdir=/usr/share/doc/expat-2.6.0
+#     make
+#     make install
+#     install -v -m644 doc/*.{html,css} /usr/share/doc/expat-2.6.0
+# popd
 
-rm -rf expat-2.6.0
+# rm -rf expat-2.6.0
 
 ################Inetutils-2.5##################
 
-tar xvf inetutils-2.5.tar.xz
+# tar xvf inetutils-2.5.tar.xz
 
-pushd inetutils-2.5
-    ./configure --prefix=/usr        \
-            --bindir=/usr/bin    \
-            --localstatedir=/var \
-            --disable-logger     \
-            --disable-whois      \
-            --disable-rcp        \
-            --disable-rexec      \
-            --disable-rlogin     \
-            --disable-rsh        \
-            --disable-servers
-    make
-    # run_make_check "make check"
-    make install
-    mv -v /usr/{,s}bin/ifconfig
-popd
+# pushd inetutils-2.5
+#     ./configure --prefix=/usr        \
+#             --bindir=/usr/bin    \
+#             --localstatedir=/var \
+#             --disable-logger     \
+#             --disable-whois      \
+#             --disable-rcp        \
+#             --disable-rexec      \
+#             --disable-rlogin     \
+#             --disable-rsh        \
+#             --disable-servers
+#     make
+#     make install
+#     mv -v /usr/{,s}bin/ifconfig
+# popd
 
-rm -rf inetutils-2.5
+# rm -rf inetutils-2.5
 
-#################less-643.tar.gz##################
+# #################less-643.tar.gz##################
 
-tar xvf less-643.tar.gz
+# tar xvf less-643.tar.gz
 
-pushd less-643
-    ./configure --prefix=/usr --sysconfdir=/etc
-    make
-    # run_make_check "make check"
-    make install
-popd
+# pushd less-643
+#     ./configure --prefix=/usr --sysconfdir=/etc
+#     make
+#     make install
+# popd
 
-rm -rf less-643
+# rm -rf less-643
 
-#################perl-5.38.2.tar.xz##################
+# #################perl-5.38.2.tar.xz##################
 
-tar xvf perl-5.38.2.tar.xz
+# tar xvf perl-5.38.2.tar.xz
 
-pushd perl-5.38.2
-    export BUILD_ZLIB=False
-    export BUILD_BZIP2=0
-    sh Configure -des                                         \
-             -Dprefix=/usr                                \
-             -Dvendorprefix=/usr                          \
-             -Dprivlib=/usr/lib/perl5/5.38/core_perl      \
-             -Darchlib=/usr/lib/perl5/5.38/core_perl      \
-             -Dsitelib=/usr/lib/perl5/5.38/site_perl      \
-             -Dsitearch=/usr/lib/perl5/5.38/site_perl     \
-             -Dvendorlib=/usr/lib/perl5/5.38/vendor_perl  \
-             -Dvendorarch=/usr/lib/perl5/5.38/vendor_perl \
-             -Dman1dir=/usr/share/man/man1                \
-             -Dman3dir=/usr/share/man/man3                \
-             -Dpager="/usr/bin/less -isR"                 \
-             -Duseshrplib                                 \
-             -Dusethreads
+# pushd perl-5.38.2
+#     export BUILD_ZLIB=False
+#     export BUILD_BZIP2=0
+#     sh Configure -des                                         \
+#              -Dprefix=/usr                                \
+#              -Dvendorprefix=/usr                          \
+#              -Dprivlib=/usr/lib/perl5/5.38/core_perl      \
+#              -Darchlib=/usr/lib/perl5/5.38/core_perl      \
+#              -Dsitelib=/usr/lib/perl5/5.38/site_perl      \
+#              -Dsitearch=/usr/lib/perl5/5.38/site_perl     \
+#              -Dvendorlib=/usr/lib/perl5/5.38/vendor_perl  \
+#              -Dvendorarch=/usr/lib/perl5/5.38/vendor_perl \
+#              -Dman1dir=/usr/share/man/man1                \
+#              -Dman3dir=/usr/share/man/man3                \
+#              -Dpager="/usr/bin/less -isR"                 \
+#              -Duseshrplib                                 \
+#              -Dusethreads
     
-    make
-    # set +e
-    # TEST_JOBS=$(nproc) make test_harness
-    # set -e
-    make install
-    unset BUILD_ZLIB BUILD_BZIP2
-popd
+#     make
+#     make install
+#     unset BUILD_ZLIB BUILD_BZIP2
+# popd
 
-rm -rf perl-5.38.2
+# rm -rf perl-5.38.2
 
-################XML::Parser-2.47##################
+# ################XML::Parser-2.47##################
 
-tar xvf XML-Parser-2.47.tar.gz
+# tar xvf XML-Parser-2.47.tar.gz
 
-pushd XML-Parser-2.47
-    perl Makefile.PL
-    make
-    # run_make_check "make test"
-    make install
-popd
+# pushd XML-Parser-2.47
+#     perl Makefile.PL
+#     make
+#     make install
+# popd
 
-rm -rf XML-Parser-2.47
+# rm -rf XML-Parser-2.47
 
-#################intltool-0.51.0.tar.gz##################
+# #################intltool-0.51.0.tar.gz##################
 
-tar xvf intltool-0.51.0.tar.gz
+# tar xvf intltool-0.51.0.tar.gz
 
-pushd intltool-0.51.0
-    sed -i 's:\\\${:\\\$\\{:' intltool-update.in
-    ./configure --prefix=/usr
-    make
-    # run_make_check "make check"
-    make install
-    install -v -Dm644 doc/I18N-HOWTO /usr/share/doc/intltool-0.51.0/I18N-HOWTO
-popd
+# pushd intltool-0.51.0
+#     sed -i 's:\\\${:\\\$\\{:' intltool-update.in
+#     ./configure --prefix=/usr
+#     make
+#     make install
+#     install -v -Dm644 doc/I18N-HOWTO /usr/share/doc/intltool-0.51.0/I18N-HOWTO
+# popd
 
-rm -rf intltool-0.51.0
+# rm -rf intltool-0.51.0
 
-#################autoconf-2.72.tar.xz##################
+# #################autoconf-2.72.tar.xz##################
 
-tar xvf autoconf-2.72.tar.xz
+# tar xvf autoconf-2.72.tar.xz
 
-pushd autoconf-2.72
-    ./configure --prefix=/usr
-    make
-    # run_make_check "make check"
-    make install
-popd
+# pushd autoconf-2.72
+#     ./configure --prefix=/usr
+#     make
+#     make install
+# popd
 
-rm -rf autoconf-2.72
+# rm -rf autoconf-2.72
 
-#################automake-1.16.5.tar.xz##################
+# #################automake-1.16.5.tar.xz##################
 
-tar xvf automake-1.16.5.tar.xz
+# tar xvf automake-1.16.5.tar.xz
 
-pushd automake-1.16.5
-    ./configure --prefix=/usr --docdir=/usr/share/doc/automake-1.16.5
-    make
-    run_make_check "make -j$(($(nproc)>4?$(nproc):4)) check"
-    make install
-popd
+# pushd automake-1.16.5
+#     ./configure --prefix=/usr --docdir=/usr/share/doc/automake-1.16.5
+#     make
+#     make install
+# popd
 
-rm -rf automake-1.16.5
+# rm -rf automake-1.16.5
 
-#################OpenSSL-3.2.1##################
+# #################OpenSSL-3.2.1##################
 
-tar xvf openssl-3.2.1.tar.gz
+# tar xvf openssl-3.2.1.tar.gz
 
-pushd openssl-3.2.1
-    ./config --prefix=/usr     \
-         --openssldir=/etc/ssl \
-         --libdir=lib          \
-         shared                \
-         zlib-dynamic
-    make
-    set +e
-    HARNESS_JOBS=$(nproc) make test
-    set -e
-    sed -i '/INSTALL_LIBS/s/libcrypto.a libssl.a//' Makefile
-    make MANSUFFIX=ssl install
-    mv -v /usr/share/doc/openssl /usr/share/doc/openssl-3.2.1
-    cp -vfr doc/* /usr/share/doc/openssl-3.2.1
-popd
+# pushd openssl-3.2.1
+#     ./config --prefix=/usr     \
+#          --openssldir=/etc/ssl \
+#          --libdir=lib          \
+#          shared                \
+#          zlib-dynamic
+#     make
+#     sed -i '/INSTALL_LIBS/s/libcrypto.a libssl.a//' Makefile
+#     make MANSUFFIX=ssl install
+#     mv -v /usr/share/doc/openssl /usr/share/doc/openssl-3.2.1
+#     cp -vfr doc/* /usr/share/doc/openssl-3.2.1
+# popd
 
-rm -rf openssl-3.2.1
+# rm -rf openssl-3.2.1
 
 ################Kmod-31 ##################
 
-tar xvf  kmod-31.tar.xz
+# tar xvf  kmod-31.tar.xz
 
-pushd kmod-31
-    ./configure --prefix=/usr          \
-            --sysconfdir=/etc      \
-            --with-openssl         \
-            --with-xz              \
-            --with-zstd            \
-            --with-zlib
-    make
-    make install
+# pushd kmod-31
+#     ./configure --prefix=/usr          \
+#             --sysconfdir=/etc      \
+#             --with-openssl         \
+#             --with-xz              \
+#             --with-zstd            \
+#             --with-zlib
+#     make
+#     make install
 
-    for target in depmod insmod modinfo modprobe rmmod; do
-        ln -sfv ../bin/kmod /usr/sbin/$target
-    done
+#     for target in depmod insmod modinfo modprobe rmmod; do
+#         ln -sfv ../bin/kmod /usr/sbin/$target
+#     done
 
-    ln -sfv kmod /usr/bin/lsmod
-popd
+#     ln -sfv kmod /usr/bin/lsmod
+# popd
 
-rm -rf kmod-31
+# rm -rf kmod-31
 
 #################Libelf Elfutils-3.10 ##################
 
-tar xvf elfutils-0.190.tar.bz2
+# tar xvf elfutils-0.190.tar.bz2
 
-pushd elfutils-0.190
-    ./configure --prefix=/usr                \
-            --disable-debuginfod         \
-            --enable-libdebuginfod=dummy
-    make
-    # run_make_check "make check"
-    make -C libelf install
-    install -vm644 config/libelf.pc /usr/lib/pkgconfig
-    rm /usr/lib/libelf.a
-popd
+# pushd elfutils-0.190
+#     ./configure --prefix=/usr                \
+#             --disable-debuginfod         \
+#             --enable-libdebuginfod=dummy
+#     make
+#     make -C libelf install
+#     install -vm644 config/libelf.pc /usr/lib/pkgconfig
+#     rm /usr/lib/libelf.a
+# popd
 
-rm -rf elfutils-0.190
+# rm -rf elfutils-0.190
 
-#################libffi-3.4.4.tar.gz##################
+# #################libffi-3.4.4.tar.gz##################
 
-tar xvf libffi-3.4.4.tar.gz
+# tar xvf libffi-3.4.4.tar.gz
 
-pushd libffi-3.4.4
-    ./configure --prefix=/usr          \
-            --disable-static       \
-            --with-gcc-arch=native
-    make
-    # run_make_check "make check"
-    make install
-popd
+# pushd libffi-3.4.4
+#     ./configure --prefix=/usr          \
+#             --disable-static       \
+#             --with-gcc-arch=native
+#     make
+#     make install
+# popd
 
-rm -rf libffi-3.4.4
+# rm -rf libffi-3.4.4
 
-#################Python-3.12.2.tar.xz##################
+# #################Python-3.12.2.tar.xz##################
 
-tar xvf Python-3.12.2.tar.xz
+# tar xvf Python-3.12.2.tar.xz
 
-pushd Python-3.12.2
-    ./configure --prefix=/usr        \
-            --enable-shared      \
-            --with-system-expat  \
-            --enable-optimizations
-    make
-    make install
-    cat > /etc/pip.conf << EOF
-[global]
-root-user-action = ignore
-disable-pip-version-check = true
-EOF
-popd
+# pushd Python-3.12.2
+#     ./configure --prefix=/usr        \
+#             --enable-shared      \
+#             --with-system-expat  \
+#             --enable-optimizations
+#     make
+#     make install
+#     cat > /etc/pip.conf << EOF
+# [global]
+# root-user-action = ignore
+# disable-pip-version-check = true
+# EOF
+# popd
 
-rm -rf Python-3.12.2
+# rm -rf Python-3.12.2
 
-#################flit_core-3.9.0.tar.gz###################
+# #################flit_core-3.9.0.tar.gz###################
 
-tar xvf flit_core-3.9.0.tar.gz
+# tar xvf flit_core-3.9.0.tar.gz
 
-pushd flit_core-3.9.0
-    pip3 wheel -w dist --no-cache-dir --no-build-isolation --no-deps $PWD
-    pip3 install --no-index --no-user --find-links dist flit_core
+# pushd flit_core-3.9.0
+#     pip3 wheel -w dist --no-cache-dir --no-build-isolation --no-deps $PWD
+#     pip3 install --no-index --no-user --find-links dist flit_core
 
-popd
+# popd
 
-rm -rf flit_core-3.9.0
+# rm -rf flit_core-3.9.0
 
-#################Wheel-0.42.0##################
+# #################Wheel-0.42.0##################
 
-tar xvf wheel-0.42.0.tar.gz
+# tar xvf wheel-0.42.0.tar.gz
 
-pushd wheel-0.42.0
-    pip3 wheel -w dist --no-cache-dir --no-build-isolation --no-deps $PWD
-    pip3 install --no-index --find-links=dist wheel
-popd
+# pushd wheel-0.42.0
+#     pip3 wheel -w dist --no-cache-dir --no-build-isolation --no-deps $PWD
+#     pip3 install --no-index --find-links=dist wheel
+# popd
 
-rm -rf wheel-0.42.0
+# rm -rf wheel-0.42.0
 
-#################setuptools-69.1.0.tar.gz##################
+# #################setuptools-69.1.0.tar.gz##################
 
-tar xvf setuptools-69.1.0.tar.gz
+# tar xvf setuptools-69.1.0.tar.gz
 
-pushd setuptools-69.1.0
-    pip3 wheel -w dist --no-cache-dir --no-build-isolation --no-deps $PWD
-    pip3 install --no-index --find-links dist setuptools
-popd
+# pushd setuptools-69.1.0
+#     pip3 wheel -w dist --no-cache-dir --no-build-isolation --no-deps $PWD
+#     pip3 install --no-index --find-links dist setuptools
+# popd
 
-rm -rf setuptools-69.1.0
+# rm -rf setuptools-69.1.0
 
-#################Ninja-1.11.1##################
+# #################Ninja-1.11.1##################
 
-tar xvf ninja-1.11.1.tar.gz
+# tar xvf ninja-1.11.1.tar.gz
 
-pushd ninja-1.11.1
-    export NINJAJOBS=4
-    sed -i '/int Guess/a \
-        int   j = 0;\
-        char* jobs = getenv( "NINJAJOBS" );\
-        if ( jobs != NULL ) j = atoi( jobs );\
-        if ( j > 0 ) return j;\
-        ' src/ninja.cc
-    python3 configure.py --bootstrap
+# pushd ninja-1.11.1
+#     export NINJAJOBS=4
+#     sed -i '/int Guess/a \
+#         int   j = 0;\
+#         char* jobs = getenv( "NINJAJOBS" );\
+#         if ( jobs != NULL ) j = atoi( jobs );\
+#         if ( j > 0 ) return j;\
+#         ' src/ninja.cc
+#     python3 configure.py --bootstrap
 
-    install -vm755 ninja /usr/bin/
-    install -vDm644 misc/bash-completion /usr/share/bash-completion/completions/ninja
-    install -vDm644 misc/zsh-completion  /usr/share/zsh/site-functions/_ninja
+#     install -vm755 ninja /usr/bin/
+#     install -vDm644 misc/bash-completion /usr/share/bash-completion/completions/ninja
+#     install -vDm644 misc/zsh-completion  /usr/share/zsh/site-functions/_ninja
 
-popd
+# popd
 
-rm -rf ninja-1.11.1
+# rm -rf ninja-1.11.1
 
-#################meson-1.3.2.tar.gz##################
+# #################meson-1.3.2.tar.gz##################
 
-tar xvf meson-1.3.2.tar.gz
+# tar xvf meson-1.3.2.tar.gz
 
-pushd meson-1.3.2
-    pip3 wheel -w dist --no-cache-dir --no-build-isolation --no-deps $PWD
-    pip3 install --no-index --find-links dist meson
-    install -vDm644 data/shell-completions/bash/meson /usr/share/bash-completion/completions/meson
-    install -vDm644 data/shell-completions/zsh/_meson /usr/share/zsh/site-functions/_meson
-popd
+# pushd meson-1.3.2
+#     pip3 wheel -w dist --no-cache-dir --no-build-isolation --no-deps $PWD
+#     pip3 install --no-index --find-links dist meson
+#     install -vDm644 data/shell-completions/bash/meson /usr/share/bash-completion/completions/meson
+#     install -vDm644 data/shell-completions/zsh/_meson /usr/share/zsh/site-functions/_meson
+# popd
 
-rm -rf meson-1.3.2
+# rm -rf meson-1.3.2
 
 ################Coreutils-9.4##################
 
-tar xvf coreutils-9.4.tar.xz
+# tar xvf coreutils-9.4.tar.xz
 
-pushd coreutils-9.4
-    patch -Np1 -i ../coreutils-9.4-i18n-1.patch
-    sed -e '/n_out += n_hold/,+4 s|.*bufsize.*|//&|' -i src/split.c
-    autoreconf -fiv
-    FORCE_UNSAFE_CONFIGURE=1 ./configure \
-            --prefix=/usr            \
-            --enable-no-install-program=kill,uptime
-    make
-    set +e
-    make NON_ROOT_USERNAME=tester check-root
-    groupadd -g 102 dummy -U tester
-    chown -R tester .
-    su tester -c "PATH=$PATH make RUN_EXPENSIVE_TESTS=yes check"
-    groupdel dummy
-    set -e
-    make install
-    mv -v /usr/bin/chroot /usr/sbin
-    mv -v /usr/share/man/man1/chroot.1 /usr/share/man/man8/chroot.8
-    sed -i 's/"1"/"8"/' /usr/share/man/man8/chroot.8
-popd
+# pushd coreutils-9.4
+#     patch -Np1 -i ../coreutils-9.4-i18n-1.patch
+#     sed -e '/n_out += n_hold/,+4 s|.*bufsize.*|//&|' -i src/split.c
+#     autoreconf -fiv
+#     FORCE_UNSAFE_CONFIGURE=1 ./configure \
+#             --prefix=/usr            \
+#             --enable-no-install-program=kill,uptime
+#     make
+#     make install
+    # mv -v /usr/bin/chroot /usr/sbin
+    # mv -v /usr/share/man/man1/chroot.1 /usr/share/man/man8/chroot.8
+    # sed -i 's/"1"/"8"/' /usr/share/man/man8/chroot.8
+# popd
 
-rm -rf coreutils-9.4
+# rm -rf coreutils-9.4
 
 #################Check-0.15.2##################
 
@@ -417,7 +384,6 @@ tar xvf check-0.15.2.tar.gz
 pushd check-0.15.2
     ./configure --prefix=/usr --disable-static
     make
-    # run_make_check "make check"
     make docdir=/usr/share/doc/check-0.15.2 install
 popd
 
@@ -430,7 +396,6 @@ tar xvf diffutils-3.10.tar.xz
 pushd diffutils-3.10
     ./configure --prefix=/usr
     make
-    # run_make_check "make check"
     make install
 popd
 
@@ -458,10 +423,6 @@ tar xvf findutils-4.9.0.tar.xz
 pushd findutils-4.9.0
     ./configure --prefix=/usr --localstatedir=/var/lib/locate
     make 
-    # set +e
-    # chown -R tester .
-    # su tester -c "PATH=$PATH make check"
-    # set -e
     make install
 popd
 
@@ -474,7 +435,6 @@ tar xvf groff-1.23.0.tar.gz
 pushd groff-1.23.0
     ./configure --prefix=/usr
     make
-    # run_make_check "make check"
     make install
 popd
 
@@ -505,7 +465,6 @@ tar xvf gzip-1.13.tar.xz
 pushd gzip-1.13
     ./configure --prefix=/usr
     make
-    # run_make_check "make check"
     make install
 popd
 
@@ -536,7 +495,6 @@ pushd kbd-2.6.4
     sed -i 's/resizecons.8 //' docs/man/man8/Makefile.in
     ./configure --prefix=/usr --disable-vlock
     make
-    # run_make_check "make check"
     make install
 popd
 
@@ -549,7 +507,6 @@ tar xvf libpipeline-1.5.7.tar.gz
 pushd libpipeline-1.5.7
     ./configure --prefix=/usr
     make
-    # run_make_check "make check"
     make install
 popd
 
@@ -562,10 +519,6 @@ tar xvf make-4.4.1.tar.gz
 pushd make-4.4.1
     ./configure --prefix=/usr
     make
-    # set +e
-    # chown -R tester .
-    # su tester -c "PATH=$PATH make check"
-    # set -e
     make install
 popd
 
@@ -578,7 +531,6 @@ tar xvf patch-2.7.6.tar.xz
 pushd patch-2.7.6
     ./configure --prefix=/usr
     make
-    # run_make_check "make check"
     make install
 popd
 
@@ -591,7 +543,6 @@ tar xvf tar-1.35.tar.xz
 pushd tar-1.35
     FORCE_UNSAFE_CONFIGURE=1 ./configure --prefix=/usr
     make
-    # run_make_check "make check"
     make install
     make -C doc install-html docdir=/usr/share/doc/tar-1.35
 popd
@@ -605,7 +556,6 @@ tar xvf texinfo-7.1.tar.xz
 pushd texinfo-7.1
     ./configure --prefix=/usr
     make
-    # run_make_check "make check"
     make install
     make TEXMF=/usr/share/texmf install-tex
     pushd /usr/share/info
@@ -626,10 +576,6 @@ pushd vim-9.1.0041
     echo '#define SYS_VIMRC_FILE "/etc/vimrc"' >> src/feature.h
     ./configure --prefix=/usr
     make
-    # set +e
-    # chown -R tester .
-    # su tester -c "TERM=xterm-256color LANG=en_US.UTF-8 make -j1 test" &> vim-test.log
-    # set -e
     make install
     ln -sv vim /usr/bin/vi
     for L in  /usr/share/man/{,*/}man1/vim.1; do
@@ -737,7 +683,6 @@ pushd dbus-1.14.10
         --docdir=/usr/share/doc/dbus-1.14.10 \
         --with-system-socket=/run/dbus/system_bus_socket
     make
-    # run_make_check "make check"
     make install
     ln -sv /etc/machine-id /var/lib/dbus
 popd
@@ -758,7 +703,6 @@ pushd man-db-2.12.0
             --with-vgrind=/usr/bin/vgrind         \
             --with-grap=/usr/bin/grap
     make
-    # run_make_check "make check"
     make install
 popd
 
@@ -775,7 +719,6 @@ pushd procps-ng-4.0.4
             --disable-kill                          \
             --with-systemd
     make src_w_LDADD='$(LDADD) -lsystemd'
-    # run_make_check "make -k check"
     make install
 popd
 
@@ -803,10 +746,6 @@ pushd util-linux-2.39.3
             ADJTIME_PATH=/var/lib/hwclock/adjtime \
             --docdir=/usr/share/doc/util-linux-2.39.3
     make
-    # set +e
-    # chown -R tester .
-    # su tester -c "make -k check"
-    # set -e
     make install
 popd
 
@@ -817,7 +756,7 @@ rm -rf util-linux-2.39.3
 tar xvf e2fsprogs-1.47.0.tar.gz
 
 pushd e2fsprogs-1.47.0
-    mkdir -v build
+    mkdir -pv build
     pushd build
         ../configure --prefix=/usr           \
              --sysconfdir=/etc       \
@@ -827,7 +766,6 @@ pushd e2fsprogs-1.47.0
              --disable-uuidd         \
              --disable-fsck
         make
-        # run_make_check "make check"
         make install
         rm -fv /usr/lib/{libcom_err,libe2p,libext2fs,libss}.a
         gunzip -v /usr/share/info/libext2fs.info.gz
@@ -839,4 +777,74 @@ popd
 rm -rf e2fsprogs-1.47.0
 
 
-echo -e "\n----------------------------------------------------------------/nEverything is done \n----------------------------------------------------------------/n"
+
+print_color "$TXT_GREEN" "Every Package installed :)"
+
+print_color "$TXT_YELLOW" "Cleaning up..."
+
+
+## CLEANING
+set +eu
+save_usrlib="$(cd /usr/lib; ls ld-linux*[^g])
+             libc.so.6
+             libthread_db.so.1
+             libquadmath.so.0.0.0
+             libstdc++.so.6.0.32
+             libitm.so.1.0.0
+             libatomic.so.1.2.0"
+
+cd /usr/lib
+
+for LIB in $save_usrlib; do
+    objcopy --only-keep-debug $LIB $LIB.dbg
+    cp $LIB /tmp/$LIB
+    strip --strip-unneeded /tmp/$LIB
+    objcopy --only-keep-debug --compress-debug-sections=zlib $LIB $LIB.dbg
+    install -vm755 /tmp/$LIB /usr/lib
+    rm /tmp/$LIB
+done
+
+online_usrbin="bash find strip"
+online_usrlib="libbfd-2.42.so
+               libsframe.so.1.0.0
+               libhistory.so.8.2
+               libncursesw.so.6.4-20230520
+               libm.so.6
+               libreadline.so.8.2
+               libz.so.1.3.1
+               libzstd.so.1.5.5
+               $(cd /usr/lib; find libnss*.so* -type f)"
+
+for BIN in $online_usrbin; do
+    cp /usr/bin/$BIN /tmp/$BIN
+    strip --strip-unneeded /tmp/$BIN
+    install -vm755 /tmp/$BIN /usr/bin
+    rm /tmp/$BIN
+done
+
+for LIB in $online_usrlib; do
+    cp /usr/lib/$LIB /tmp/$LIB
+    strip --strip-unneeded /tmp/$LIB
+    install -vm755 /tmp/$LIB /usr/lib
+    rm /tmp/$LIB
+done
+
+for i in $(find /usr/lib -type f -name \*.so* ! -name \*dbg) \
+         $(find /usr/lib -type f -name \*.a)                 \
+         $(find /usr/{bin,sbin,libexec} -type f); do
+    case "$online_usrbin $online_usrlib $save_usrlib" in
+        *$(basename $i)* )
+            ;;
+        * ) strip --strip-unneeded $i
+            ;;
+    esac
+done
+
+unset BIN LIB save_usrlib online_usrbin online_usrlib
+
+rm -rf /tmp/*
+find /usr/lib /usr/libexec -name \*.la -delete
+find /usr -depth -name $(uname -m)-lfs-linux-gnu\* | xargs rm -rf
+userdel -r tester
+
+print_color "$TXT_GREEN" "Cleaning finished !"

@@ -1,13 +1,14 @@
 #!/bin/bash
 
-mkdir -pv $LFS/{dev,proc,sys,run}
+losetup --partscan --find --show lfs.iso
+mount -v -t ext4 /dev/loop0p2 /mnt/lfs
+swapon -v /dev/loop0p3
 
 mount -v --bind /dev $LFS/dev
 mount -vt devpts devpts -o gid=5,mode=0620 $LFS/dev/pts
 mount -vt proc proc $LFS/proc
 mount -vt sysfs sysfs $LFS/sys
 mount -vt tmpfs tmpfs $LFS/run
-
 if [ -h $LFS/dev/shm ]; then
   install -v -d -m 1777 $LFS$(realpath /dev/shm)
 else

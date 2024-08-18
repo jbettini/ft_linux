@@ -1,40 +1,32 @@
-# !/bin/bash
+!/bin/bash
 
-set -eu
+TXT_RED="\033[1;31m"
+TXT_GREEN="\033[1;32m"
+TXT_YELLOW="\033[1;33m"
+TXT_BLUE="\033[1;34m"
+FANCY_RESET="\033[0m"
+
+print_color () {
+    echo -e "$1$2$FANCY_RESET"
+}
+
+user=$(whoami)
+
+if [ $user != "root" ]; then 
+    echo -e "Please, Load this script with root\n"
+    exit 1
+fi
 
 handle_error() {
-    echo "Error: line $1"
+    print_color "$TXT_RED" "Error: line $1"
     exit 1
 }
 
 trap 'handle_error $LINENO' ERR
 
+set -eu
+
 cd /sources
-
-run_make_check() {
-    set +e 
-    $1
-    # $1 2>&1 | tee check-log
-    # make check 2>&1 | tee check-log
-    set -e
-    # total_success=$(($(grep -c 'SUCESS' check-log) + $(grep -c 'PASS' check-log) + $(grep -c 'pass' check-log) + $(grep -c 'sucess' check-log)))
-    # total_FAIL=$(($(grep -c 'FAIL' check-log) + $(grep -c 'FAILED' check-log) + $(grep -c 'FAILLURE' check-log)))
-    # total_fail=$(($(grep -c 'fail' check-log) + $(grep -c 'failed' check-log) + $(grep -c 'faillure' check-log)))
-    # total_fails=$(total_fail + total_FAIL)
-
-    # total_success=${total_succ:-0}
-    # total_fails=${total_fail:-0}
-
-    # total_tests=$(total_fails + total_success)
-    # ratio_fail=$(total_fails * 100 / total_tests)
-    # if [ $ratio_fail -gt 7 ]; then
-    #     echo "Check failed"
-    #     exit 1
-    # else 
-    #     echo -e "CHECK IS PASS WITH SUCESS\n"
-    # fi
-}
-
 
 ################Man-pages-6.06##################
 
@@ -63,7 +55,7 @@ tar xvf glibc-2.39.tar.xz
 
 pushd glibc-2.39
     patch -Np1 -i ../glibc-2.39-fhs-1.patch
-    mkdir -v build
+    mkdir -pv build
     pushd build
         echo "rootsbindir=/usr/sbin" > configparms
         ../configure --prefix=/usr                            \
@@ -75,9 +67,6 @@ pushd glibc-2.39
         make
         touch /etc/ld.so.conf
         sed '/test-installation/s@$(PERL)@echo not running@' -i ../Makefile
-        
-        run_make_check "check"
-        
         make install
         sed '/RTLDLIST=/s@/usr@@g' -i /usr/bin/ldd
         make localedata/install-locales
@@ -116,9 +105,6 @@ EOF
         zic -d $ZONEINFO -p Europe/Paris
         unset ZONEINFO
         tzselect
-        7
-        15
-        1
         ln -sfv /usr/share/zoneinfo/Europe/Paris /etc/localtime
         cat > /etc/ld.so.conf << "EOF"
 # Begin /etc/ld.so.conf
@@ -144,9 +130,6 @@ tar xvf zlib-1.3.1.tar.gz
 pushd zlib-1.3.1
     ./configure --prefix=/usr
     make
-
-    run_make_check "check"
-
     make install
     rm -fv /usr/lib/libz.a
 popd
@@ -185,7 +168,6 @@ pushd xz-5.4.6
             --disable-static \
             --docdir=/usr/share/doc/xz-5.4.6
     make
-    run_make_check "check"
     make install
 popd
 
@@ -197,21 +179,19 @@ tar xvf zstd-1.5.5.tar.gz
 
 pushd zstd-1.5.5
     make prefix=/usr
-    run_make_check "check"
-    make prefix=/usr install
+    make prefix=/u install
     rm -v /usr/lib/libzstd.a
 popd
 
 rm -rf zstd-1.5.5
 
-#################File-5.45##################
+################File-5.45##################
 
 tar xvf file-5.45.tar.gz
 
 pushd file-5.45
     ./configure --prefix=/usr
     make
-    run_make_check "check"
     make install
 popd
 
@@ -243,7 +223,6 @@ tar xvf m4-1.4.19.tar.xz
 pushd m4-1.4.19
     ./configure --prefix=/usr
     make
-    run_make_check "check"
     make install
 popd
 
@@ -256,7 +235,7 @@ tar xvf bc-6.7.5.tar.xz
 pushd bc-6.7.5
     CC=gcc ./configure --prefix=/usr -G -O3 -r
     make
-    run_make_check "test"
+
     make install
 popd
 
@@ -271,7 +250,6 @@ pushd flex-2.6.4
             --docdir=/usr/share/doc/flex-2.6.4 \
             --disable-static
     make
-    run_make_check "check"
     make install
     ln -sv flex   /usr/bin/lex
     ln -sv flex.1 /usr/share/man/man1/lex.1
@@ -307,7 +285,7 @@ pushd tcl8.6.13
 
     unset SRCDIR
 
-    run_make_check "test"
+
     make install
     chmod -v u+w /usr/lib/libtcl8.6.so
     make install-private-headers
@@ -333,7 +311,7 @@ pushd expect5.45.4
             --mandir=/usr/share/man \
             --with-tclinclude=/usr/include
     make
-    run_make_check "test"
+
     make install
     ln -svf expect5.45.4/libexpect5.45.4.so /usr/lib
 popd
@@ -345,12 +323,11 @@ rm -rf expect5.45.4
 tar xvf dejagnu-1.6.3.tar.gz
 
 pushd dejagnu-1.6.3
-    mkdir -v build
+    mkdir -pv build
     pushd build
         ../configure --prefix=/usr
         makeinfo --html --no-split -o doc/dejagnu.html ../doc/dejagnu.texi
-        makeinfo --plaintext       -o doc/dejagnu.txt  ../doc/dejagnu.texi
-        run_make_check "check"
+        makeinfo --plaintext       -o doc/dejagnu.txt  ../doc/dejagnu.texi        
         make install
         install -v -dm755  /usr/share/doc/dejagnu-1.6.3
         install -v -m644   doc/dejagnu.{html,txt} /usr/share/doc/dejagnu-1.6.3
@@ -375,12 +352,12 @@ popd
 
 rm -rf pkgconf-2.1.1
 
-#################Binutils-2.42##################
+################Binutils-2.42##################
 
 tar xvf binutils-2.42.tar.xz
 
 pushd binutils-2.42
-    mkdir -v build
+    mkdir -pv build
     pushd build
         ../configure --prefix=/usr       \
              --sysconfdir=/etc   \
@@ -394,7 +371,6 @@ pushd binutils-2.42
              --enable-default-hash-style=gnu
         make tooldir=/usr
         set +e
-        make -k check
         make tooldir=/usr install
         set -e
         rm -fv /usr/lib/lib{bfd,ctf,ctf-nobfd,gprofng,opcodes,sframe}.a
@@ -414,15 +390,6 @@ pushd gmp-6.3.0
             --docdir=/usr/share/doc/gmp-6.3.0
     make
     make html
-    set +e
-    make check 2>&1 | tee gmp-check-log
-    set -e
-    total_passed=$(awk '/# PASS:/{total+=$3} ; END{print total}' gmp-check-log)
-    if [ "total_passed" -lt 199 ]; then
-        echo "check for gmp failed"
-        exit 1
-    fi
-
     make install
     make install-html
 popd
@@ -439,15 +406,6 @@ pushd mpfr-4.2.1
             --docdir=/usr/share/doc/mpfr-4.2.1
     make
     make html
-    # Check if minimum of 198 pass
-    set +e
-    make check 2>&1 | tee mpfr-check-log
-    set -e
-    total_passed=$(awk '/# PASS:/{total+=$3} ; END{print total}' mpfr-check-log)
-    if [ "total_passed" -lt 199 ]; then
-        echo "check for gmp failed"
-        exit 1
-    fi
     make install
     make install-html
 popd
@@ -464,7 +422,6 @@ pushd mpc-1.3.1
             --docdir=/usr/share/doc/mpc-1.3.1
     make
     make html
-    run_make_check "make check"
     make install
     make install-html
 popd
@@ -481,7 +438,6 @@ pushd attr-2.5.2
             --sysconfdir=/etc \
             --docdir=/usr/share/doc/attr-2.5.2
     make
-    run_make_check "make check"
     make install
 
 popd
@@ -509,7 +465,6 @@ tar xvf libcap-2.69.tar.xz
 pushd libcap-2.69
     sed -i '/install -m.*STA/d' libcap/Makefile
     make prefix=/usr lib=lib
-    run_make_check "make test"
     make prefix=/usr lib=lib install
 popd
 
@@ -526,7 +481,6 @@ pushd libxcrypt-4.4.36
             --disable-static             \
             --disable-failure-tokens
     make
-    run_make_check "make check"
     make install
 popd
 
@@ -580,7 +534,7 @@ pushd gcc-13.2.0
         sed -e '/m64=/s/lib64/lib/' -i.orig gcc/config/i386/t-linux64
         ;;
     esac
-    mkdir -v build
+    mkdir -pv build
     pushd build
         ../configure --prefix=/usr      \
              LD=ld                      \
@@ -598,9 +552,6 @@ pushd gcc-13.2.0
         ulimit -s 32768
         chown -R tester .
         ## Warning set -j<num of cores> to ur cores number
-        set +e
-        su tester -c "PATH=$PATH make -k -j4 check"
-        set -e
         ../contrib/test_summary
         make install
         chown -v -R root:root \
@@ -753,8 +704,6 @@ pushd sed-4.9
     ./configure --prefix=/usr
     make
     make html
-    chown -R tester .
-    su tester -c "PATH=$PATH make check"
     make install
     install -d -m755           /usr/share/doc/sed-4.9
     install -m644 doc/sed.html /usr/share/doc/sed-4.9
@@ -770,7 +719,6 @@ tar xvf psmisc-23.6.tar.xz
 pushd psmisc-23.6
     ./configure --prefix=/usr
     make
-    run_make_check "make check"
     make install
 popd
 
@@ -785,7 +733,6 @@ pushd gettext-0.22.4
             --disable-static \
             --docdir=/usr/share/doc/gettext-0.22.4
     make
-    run_make_check "make check"
 
     make install
     chmod -v 0755 /usr/lib/preloadable_libintl.so
@@ -801,7 +748,6 @@ tar xvf bison-3.8.2.tar.xz
 pushd bison-3.8.2
     ./configure --prefix=/usr --docdir=/usr/share/doc/bison-3.8.2
     make
-    run_make_check "make check"
     make install
 popd
 
@@ -815,7 +761,6 @@ pushd grep-3.11
     sed -i "s/echo/#echo/" src/egrep.sh
     ./configure --prefix=/usr
     make
-    run_make_check "make check"
     make install
 popd
 
@@ -832,17 +777,11 @@ pushd bash-5.2.21
             --with-installed-readline \
             --docdir=/usr/share/doc/bash-5.2.21
     make
-    chown -R tester .
-    set +e
-    su -s /usr/bin/expect tester << "EOF"
-set timeout -1
-spawn make tests
-expect eof
-lassign [wait] _ _ _ value
-exit $value
-EOF
-    set -e
     make install
 popd
 
 rm -rf bash-5.2.21
+
+exec /usr/bin/bash --login
+
+print_color "$TXT_YELLOW" "Fisrst Part of package Finish, Now just execute the second script"

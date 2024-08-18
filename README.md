@@ -68,109 +68,43 @@ cfdisk /path/to/your/iso
 ```
 Select DOS:
     Create Partition :
-        -   "New" → "Primary" → Size: 20G → Type: Linux
-        Create Swap Partition (2GB):
-        -   "New" → "Primary" → Size: 2G → Type: Linux swap / Solaris
+    ```
+        -   "New" → "Primary" → Size: 1M → Type: 83 Linux  -> Select Bootable
         Create Boot Partition (1M):
-        -   "New" → "Primary" → Size: 1M → Type: BIOS boot → Select Bootable
+        -   "New" → "Primary" → Size: 18G → Type: 83 Linux
+        Create Root Partition (18G)
+        -   "New" → "Primary" → Size: 2G → Type: Linux swap / Solaris
+        Create Swap Partition (2GB):
         Save and Quit:
         -   Write changes, confirm with yes, then "Quit"
-
+    ```
 Configure your ISO image as a loop device and access its partitions, use the following command:
 ```
 losetup --partscan --find --show lfs.iso
 ```
-
-
 -----------------------------------
-##### 3.  Create File Systems
+##### 3. Prepare The System
 
-Boot Partition:
-```
-mkfs -v -t ext4 /dev/loop0p1
-```
+This section outlines the script's actions to set up the system:
 
-Main Partition:
+-   Create Filesystem and Mount Partitions:
+    -   Initializes and mounts the necessary filesystems.
+-   Create User lfs:
+    -   Creates the user lfs for managing the build environment.
+-   Download Required Packages:
+    -   Downloads all necessary packages for the build process.
+    -   If any package download fails due to a broken link, it must be downloaded manually. The script will notify you of any such issues.
+-   Check for Broken Links:
+    -   Verifies that all downloaded packages are correctly linked and available.
+Run the script as root with:
 ```
-mkfs -v -t ext4 /dev/loop0p2
+bash prepare_system.sh
 ```
+This will prepare the system for the subsequent steps.
 
-SWAP Partition:
-```
-mkswap    /dev/loop0p3
-```
------------------------------------
-##### 4.  Set the Environment
-
-For Fish Shell:
-```
-set -Ux LFS /mnt/lfs
-```
-For Bash Shell:
-```
-echo "export LFS=/mnt/lfs" >> ~/.bash_profile
-echo "export LFS=/mnt/lfs" >> ~/.bashrc
-source ~/.bashrc
-source ~/.bash_profile
-```
-Verify:
-```
-echo $LFS
-```
-Ensure it outputs /mnt/lfs.
-
------------------------------------
-##### 5. Mount the Partitions
-
-Create Mount Point:
-```
-mkdir -pv $LFS
-```
-Mount Main Partition:
-```
-mount -v -t ext4 /dev/loop0p2 $LFS
-```
-Enable Swap Partition:
-```
-swapon -v /dev/loop0p3
-```
-Add to /etc/fstab
-```
-/dev/loop0p2            /mnt/lfs        ext4            defaults        1       1
-/dev/loop0p3            none            swap            sw              0       0
-```
-And reload your systemd :
-```
-systemctl daemon-reload
-```
-The boot partition is typically mounted later during the bootloader installation process. For now, ensure the main partition and swap are set up and ready for the LFS build.
-
------------------------------------
-##### 6. Download Packages
-
-Create Sources Directory:
-```
-mkdir -v $LFS/sources
-chmod -v a+wt $LFS/sources
-```
-Copy the file md5sums in $LFS/sources. Download with wget, use the wget-list files present in the repository as inputfile, and check if everything is downloaded with check_dl_package:
-```
-wget --input-file=wget-list-systemd --continue --directory-prefix=$LFS/sources;
-wget --input-file=wget-list-patch --continue --directory-prefix=$LFS/sources;
-bash check_dl_package.
-```
-Now just set the folders and the user lfs, execute these scripts:
-```
-bash build_folder.sh;
-bash set_user.sh
-```
------------------------------------
-##### 7. Set LFS users env
-
-Connect to the user lfs and execute the script set_userLfs_env.sh
+User lfs is ready connect to it :
 ```
 su - lfs;
-bash set_userLfs_env.sh
 ```
 -----------------------------------
 
@@ -192,12 +126,9 @@ Cross-compilation is the process of building executable code for a platform diff
 ##### 1. How Scripts Work
 
 Follow this process unless otherwise instructed. Summary of the build process:
+
 Prepare Sources:
 -   Place all sources and patches in /mnt/lfs/sources/.
-Connect to the user lfs:
-```
-su - lfs
-```
 Navigate to the Sources Directory:
 ```
 cd /mnt/lfs/sources
@@ -207,22 +138,20 @@ For Each Package:
 ```
 tar xvf package-name.tar.xz
 ```
--   Use pushd to enter the extracted package directory.
+-   Use pushd/cd to enter the extracted package directory.
 -   Build the package with the specific instructions from LFS.
--   Use popd to return to /mnt/lfs/sources.
--   Clean up:
+-   Use popd or cd .. to return to /mnt/lfs/sources.
+-   Clean up with :
 ```
 rm -rf package-name
 ```
+
 ##### 2. Compiling and Building Cross Tools
 
-For this part, just execute the first script and wait:
+For this part, connect to lfs user and execute this script and wait:
 ```
-sh cross_pk1.sh
-```
-If something occurs, check if you missed something before. Otherwise, just execute the second script and wait:
-```
-sh cross_pk2.sh
+su - lfs
+sh install_cross_tools.sh
 ```
 
 ##### 3. Prepare and configure chroot
@@ -231,164 +160,46 @@ sh cross_pk2.sh
 
 `chroot`, short for "change root," is a Unix system operation that changes the apparent root directory for a running process and its children. This creates an isolated environment where the process cannot access files outside the designated directory tree. It is commonly used for creating a contained development environment, testing software, or improving security by limiting the access of certain processes to a specific subset of the file system.
 
--   First disconnect from lfs user and connect to root :
+-   Disconnect from lfs user and connect to root :
 ```
-su -
+"su - " OR "CTRL + D"
 ```
--   Execute the script `giveRightToRoot.sh' :
+Now we need to prepare our chroot by executing the following script:
 ```
-bash    giveRightToRoot.sh
+prepare_chroot.sh
 ```
--   Mount the chroot environnement :
-```
-bash mountChroot.sh
-```
--   Configure /dev/null :
-```
-sudo rm -f /mnt/lfs/dev/null
-sudo mknod -m 666 /mnt/lfs/dev/null c 1 3
-ls -l /mnt/lfs/dev/null
-```
+This script sets up the chroot environment by:
+-   Root Check: Ensures the script is run as root.
+-   Permissions: Grants necessary permissions to chroot directories.
+-   Mounting: Mounts required filesystems into the chroot.
+-   Configure /dev/null: Creates a special /dev/null file within the chroot.
+-   Copy: Copies the final configuration script into the chroot.
 
--   Enter in chroot environnement :
+Execute the script with:
+```
+bash prepare_chroot.sh
+```
+Final Steps :
+-   Enter the chroot environment and run the final installation and configuration scripts:
 ```
 bash enterInChroot.sh
-```
--   Now we need to set the environment :
-```
-cat >> setChrootEnv.sh << EOF
-
-mkdir -pv /{boot,home,mnt,opt,srv}
-mkdir -pv /etc/{opt,sysconfig}
-mkdir -pv /lib/firmware
-mkdir -pv /media/{floppy,cdrom}
-mkdir -pv /usr/{,local/}{include,src}
-mkdir -pv /usr/local/{bin,lib,sbin}
-mkdir -pv /usr/{,local/}share/{color,dict,doc,info,locale,man}
-mkdir -pv /usr/{,local/}share/{misc,terminfo,zoneinfo}
-mkdir -pv /usr/{,local/}share/man/man{1..8}
-mkdir -pv /var/{cache,local,log,mail,opt,spool}
-mkdir -pv /var/lib/{color,misc,locate}
-ln -sfv /run /var/run
-ln -sfv /run/lock /var/lock
-install -dv -m 0750 /root
-install -dv -m 1777 /tmp /var/tmp
-
-EOF
-```
-
--   After this we need to create all the essential file and symbolic link, copy paste this commands :
-
-```
-ln -sv /proc/self/mounts /etc/mtab
-
-cat > /etc/hosts << EOF
-127.0.0.1  localhost $(hostname)
-::1        localhost
-EOF
-
-cat > /etc/passwd << "EOF"
-root:x:0:0:root:/root:/bin/bash
-bin:x:1:1:bin:/dev/null:/usr/bin/false
-daemon:x:6:6:Daemon User:/dev/null:/usr/bin/false
-messagebus:x:18:18:D-Bus Message Daemon User:/run/dbus:/usr/bin/false
-systemd-journal-gateway:x:73:73:systemd Journal Gateway:/:/usr/bin/false
-systemd-journal-remote:x:74:74:systemd Journal Remote:/:/usr/bin/false
-systemd-journal-upload:x:75:75:systemd Journal Upload:/:/usr/bin/false
-systemd-network:x:76:76:systemd Network Management:/:/usr/bin/false
-systemd-resolve:x:77:77:systemd Resolver:/:/usr/bin/false
-systemd-timesync:x:78:78:systemd Time Synchronization:/:/usr/bin/false
-systemd-coredump:x:79:79:systemd Core Dumper:/:/usr/bin/false
-uuidd:x:80:80:UUID Generation Daemon User:/dev/null:/usr/bin/false
-systemd-oom:x:81:81:systemd Out Of Memory Daemon:/:/usr/bin/false
-nobody:x:65534:65534:Unprivileged User:/dev/null:/usr/bin/false
-EOF
-
-cat > /etc/group << "EOF"
-root:x:0:
-bin:x:1:daemon
-sys:x:2:
-kmem:x:3:
-tape:x:4:
-tty:x:5:
-daemon:x:6:
-floppy:x:7:
-disk:x:8:
-lp:x:9:
-dialout:x:10:
-audio:x:11:
-video:x:12:
-utmp:x:13:
-cdrom:x:15:
-adm:x:16:
-messagebus:x:18:
-systemd-journal:x:23:
-input:x:24:
-mail:x:34:
-kvm:x:61:
-systemd-journal-gateway:x:73:
-systemd-journal-remote:x:74:
-systemd-journal-upload:x:75:
-systemd-network:x:76:
-systemd-resolve:x:77:
-systemd-timesync:x:78:
-systemd-coredump:x:79:
-uuidd:x:80:
-systemd-oom:x:81:
-wheel:x:97:
-users:x:999:
-nogroup:x:65534:
-EOF
-
-echo "tester:x:101:101::/home/tester:/bin/bash" >> /etc/passwd
-echo "tester:x:101:" >> /etc/group
-install -o tester -d /home/tester
-exec /usr/bin/bash --login
-
-touch /var/log/{btmp,lastlog,faillog,wtmp}
-chgrp -v utmp /var/log/lastlog
-chmod -v 664  /var/log/lastlog
-chmod -v 600  /var/log/btmp
-```
-
--   Last Step for this part is to install the following tools just cpoy paste the content of cross_pk3.sh in the midlle of the command :
-
-```
-cat >> cross_pk3.sh << EOF
-
-...
-<Copy paste the content of cross_pk3.sh>
-...
-
-EOF
-```
-```
-bash cross_pk3.sh
-```
--   Just wait the installation of all and use :
-```
-rm -rf cross_pk3.sh
+./last_settings.sh
 ```
 
 ##### 4a. Saving current state
 
 At this part u can save the current state of your project, if u are using a virtual machine just take a snapshot otherwise follow this instructions :
 
--   Quit the chroot environemment :
+-   Return to the root Home and execute the script ./Utils/save_state.sh :
 ```
-exit
+bash save_state.sh
 ```
--   Unmount the virtual file system :
-```
-mountpoint -q $LFS/dev/shm && umount $LFS/dev/shm
-umount $LFS/dev/pts
-umount $LFS/{sys,proc,run,dev}
-```
--   Create an achive of the current state:
-```
-cd $LFS
-tar -cJpf $HOME/lfs-temp-tools-12.1-systemd.tar.xz .
-```
+What the Script Does:
+-   The script will:
+    -   Unmount the LFS filesystem.
+    -   Create an archive of all the files in the current environment.
+    -   Remount all necessary filesystems to restore the environment.
+
 
 ##### 4b. Restore the system state
 
@@ -397,46 +208,77 @@ If u are using a virtual machine just restore from a snapshot, if u follow the i
 ```
 cd $LFS
 rm -rf ./*
-tar -xpf $HOME/lfs-temp-tools-12.1-systemd.tar.xz
+tar -xpf $HOME/backup_lfs_systemd.tar.xz
 ```
+### III. Building the LFS System
 
+#### Troubleshooting
 
-### III. Construction of the LFS system
+    If you encounter errors during script execution: Check the line where the script stopped. Comment out all packages before this point and try installing them manually.
+    If installation fails despite following these steps: Ensure you haven’t missed any previous steps.
 
-In this chapter, we begin the actual construction of the LFS system. We are now at the final stage of project. Although installation instructions could often be shorter and more generic, we provide complete instructions for each package to minimize errors.
+##### 1. Installing All Packages
 
-#### Installation of all packages
+In this chapter, we begin the actual construction of the LFS system. To minimize errors, we provide detailed instructions for each package, even though some installation instructions might be shorter and more generic.
+Installing All Packages
 
-Before starting, each scripts takes a very long time to complete, if u have an error during the execution, just check the line where the script stop comment all package before, and do it manually, if even with this the package installation fail, check if u dont miss a step before, lets start :
-
--   First connect to root, and copy the script package.sh inside chroot:
+Ensure you are root and inside the chroot environment:
 ```
 su -
-cp -f package.sh /mnt/lfs/.
-cp -f package2.sh /mnt/lfs/.
-```
--   Then enter in chroot:
-```
 sh enterInChroot.sh
 ```
--   Start the package installation script:
+Run the package installation script. Note that you need to select your timezone when installing Glibc. After the first script finishes, execute the second script manually:
 ```
 bash package.sh
 ```
-
--   At this step we have bash installed lets use it :
+    First part of package installation completed. Now, execute the second script:
 ```
-exec /usr/bin/bash
-bash package2.sh
+    bash package2.sh
 ```
 
--   Now it is optinoal but you can execute the "cleanup.sh" script, if you choose to do this be sure to save before, check the chapter II - 4a to know how to save the current state of your LFS system:
-```
-exit
-cp -f cleanup.sh /mnt/lfs/.
-sh enterInChroot.sh
-bash cleanup.sh
-```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 ### IV. Last settings
 
