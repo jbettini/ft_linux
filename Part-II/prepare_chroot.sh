@@ -61,6 +61,4 @@ ls -l /mnt/lfs/dev/null
 print_color "$TXT_GREEN" "/dev/null is set."
 
 chmod 777 ./last_settings.sh
-cp -f ./last_settings.sh $LFS/.
-cp -f ../Part-III/* $LFS/.
-print_color "$TXT_YELLOW" "EveryThings is set now just, Follow the manual."
+print_color "$TXT_YELLOW" "EveryThings is set, Follow the manual."

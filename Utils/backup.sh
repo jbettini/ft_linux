@@ -6,6 +6,8 @@ TXT_YELLOW="\033[1;33m"
 TXT_BLUE="\033[1;34m"
 FANCY_RESET="\033[0m"
 
+set -eu
+
 print_color () {
     echo -e "$1$2$FANCY_RESET"
 }
@@ -22,17 +24,18 @@ if [ -z "$LFS" ]; then
     exit 1
 fi
 
+read -p "Enter a name for your LFS system backup: " name
+
 # Umount system
 print_color "$TXT_BLUE" "Umounting LFS chroot"
 mountpoint -q $LFS/dev/shm && umount $LFS/dev/shm
 umount $LFS/dev/pts
 umount $LFS/{sys,proc,run,dev}
 
-set -eu
-
-cd $LFS
-print_color "$TXT_BLUE" "Creating the backup..."
-tar -cJpf $HOME/backup_lfs_systemd.tar.xz .
+pushd $LFS
+  print_color "$TXT_BLUE" "Creating the backup..."
+  tar -cJpf $HOME/$name.tar.xz .
+popd
 
 print_color "$TXT_BLUE" "reset chroot..."
 mount -v --bind /dev $LFS/dev
@@ -46,4 +49,4 @@ else
   mount -vt tmpfs -o nosuid,nodev tmpfs $LFS/dev/shm
 fi
 
-print_color "$TXT_GREEN" "Backup create in the folder : $HOME"
+print_color "$TXT_GREEN" "Backup create here : $HOME/$name"

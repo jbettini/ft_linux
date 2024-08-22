@@ -117,12 +117,14 @@ cca7dc8c73147444e77bc45d210229bb  coreutils-9.4-i18n-1.patch
 f75cca16a38da6caa7d52151f7136895  kbd-2.6.4-backspace-1.patch
 9ed497b6cb8adcb8dbda9dee9ebce791  readline-8.2-upstream_fixes-3.patch
 8d9c1014445c463cf7c24c162b1e0686  systemd-255-upstream_fixes-1.patch
+78aae762c95e2d731faf88d482e4cde5  net-tools-2.10.tar.xz
+ef8356d711b17701928ead7206d15234  dhcpcd-10.0.6.tar.xz
 EOF
 }
 
 
 create_package_list () {
-cat << EOF >> ./wget-list-systemd
+cat << EOF >> ./wget-list
 https://download.savannah.gnu.org/releases/acl/acl-2.3.2.tar.xz
 https://download.savannah.gnu.org/releases/attr/attr-2.5.2.tar.gz
 https://ftp.gnu.org/gnu/autoconf/autoconf-2.72.tar.xz
@@ -213,6 +215,8 @@ https://www.linuxfromscratch.org/patches/lfs/12.1/glibc-2.39-fhs-1.patch
 https://www.linuxfromscratch.org/patches/lfs/12.1/kbd-2.6.4-backspace-1.patch
 https://www.linuxfromscratch.org/patches/lfs/12.1/readline-8.2-upstream_fixes-3.patch
 https://www.linuxfromscratch.org/patches/lfs/12.1/systemd-255-upstream_fixes-1.patch
+https://downloads.sourceforge.net/project/net-tools/net-tools-2.10.tar.xz
+https://github.com/NetworkConfiguration/dhcpcd/releases/download/v10.0.6/dhcpcd-10.0.6.tar.xz
 EOF
 }
 
@@ -234,7 +238,9 @@ echo "export LFS=/mnt/lfs" >> ~/.bash_profile
 echo "export LFS=/mnt/lfs" >> ~/.bashrc
 export LFS=/mnt/lfs
 mkdir -pv $LFS
+mkdir -vp $LFS/boot
 mount -v -t ext4 /dev/loop0p2 $LFS
+mount -v -t ext4 /dev/loop0p1 $LFS/boot
 swapon -v /dev/loop0p3
 
 print_color "$TXT_GREEN" "Partition Mounted"
@@ -248,10 +254,12 @@ chmod -v a+wt $LFS/sources
 
 print_color "$TXT_BLUE" "Downloading Package..."
 
+set +eu
 apt-get install wget -y
 create_package_list
-wget --input-file=./wget-list-systemd --continue --directory-prefix=$LFS/sources;
-rm ./wget-list-systemd
+wget --input-file=./wget-list --continue --directory-prefix=$LFS/sources;
+rm ./wget-list
+set -eu
 
 print_color "$TXT_GREEN" "Packages Downloaded"
 
@@ -317,6 +325,5 @@ EOF
 cat >> ~/.bashrc << "EOF"
 export MAKEFLAGS=-j$(nproc)
 EOF
-cp -f ./install_cross_tools.sh /home/lfs/.
 
 print_color "$TXT_GREEN" "Setup Complete. Follow the manual for further instructions."

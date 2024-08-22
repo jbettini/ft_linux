@@ -1,4 +1,4 @@
-!/bin/bash
+#!/bin/bash
 
 TXT_RED="\033[1;31m"
 TXT_GREEN="\033[1;32m"
@@ -28,7 +28,7 @@ set -eu
 
 cd /sources
 
-################Man-pages-6.06##################
+###############Man-pages-6.06##################
 
 tar xvf man-pages-6.06.tar.xz
 
@@ -47,17 +47,7 @@ pushd iana-etc-20240125
     cp services protocols /etc
 popd
 
-rm -rf iana-etc-20240125
-
-################Glibc-2.39##################
-
-tar xvf glibc-2.39.tar.xz
-
-pushd glibc-2.39
-    patch -Np1 -i ../glibc-2.39-fhs-1.patch
-    mkdir -pv build
-    pushd build
-        echo "rootsbindir=/usr/sbin" > configparms
+rm -rf ian       echo "rootsbindir=/usr/sbin" > configparms
         ../configure --prefix=/usr                            \
              --disable-werror                         \
              --enable-kernel=4.19                     \
@@ -104,7 +94,11 @@ EOF
         cp -v zone.tab zone1970.tab iso3166.tab $ZONEINFO
         zic -d $ZONEINFO -p Europe/Paris
         unset ZONEINFO
-        tzselect
+        tzselect << EOF
+7
+15
+1
+EOF
         ln -sfv /usr/share/zoneinfo/Europe/Paris /etc/localtime
         cat > /etc/ld.so.conf << "EOF"
 # Begin /etc/ld.so.conf
@@ -179,13 +173,13 @@ tar xvf zstd-1.5.5.tar.gz
 
 pushd zstd-1.5.5
     make prefix=/usr
-    make prefix=/u install
+    make prefix=/usr install
     rm -v /usr/lib/libzstd.a
 popd
 
 rm -rf zstd-1.5.5
 
-################File-5.45##################
+###############File-5.45##################
 
 tar xvf file-5.45.tar.gz
 
@@ -350,9 +344,19 @@ pushd pkgconf-2.1.1
     ln -sv pkgconf.1 /usr/share/man/man1/pkg-config.1 
 popd
 
-rm -rf pkgconf-2.1.1
+rm -rf pkgconf-2.1.1a-etc-20240125
 
-################Binutils-2.42##################
+################Glibc-2.39##################
+
+tar xvf glibc-2.39.tar.xz
+
+pushd glibc-2.39
+    patch -Np1 -i ../glibc-2.39-fhs-1.patch
+    mkdir -pv build
+    pushd build
+ 
+
+# ################Binutils-2.42##################
 
 tar xvf binutils-2.42.tar.xz
 
@@ -370,16 +374,14 @@ pushd binutils-2.42
              --with-system-zlib  \
              --enable-default-hash-style=gnu
         make tooldir=/usr
-        set +e
         make tooldir=/usr install
-        set -e
         rm -fv /usr/lib/lib{bfd,ctf,ctf-nobfd,gprofng,opcodes,sframe}.a
     popd
 popd
 
 rm -rf binutils-2.42
 
-################GMP-6.3.0##################
+# ###############GMP-6.3.0##################
 
 tar xvf gmp-6.3.0.tar.xz
 
@@ -396,7 +398,7 @@ popd
 
 rm -rf gmp-6.3.0
 
-#################MPFR-4.2.1##################
+################MPFR-4.2.1##################
 tar xvf mpfr-4.2.1.tar.xz
 
 pushd mpfr-4.2.1
@@ -412,7 +414,7 @@ popd
 
 rm -rf mpfr-4.2.1
 
-#################MPC-1.3.1##################
+################MPC-1.3.1##################
 
 tar xvf mpc-1.3.1.tar.gz
 
@@ -428,7 +430,7 @@ popd
 
 rm -rf mpc-1.3.1
 
-#################Attr-2.5.2##################
+################Attr-2.5.2##################
 
 tar xvf attr-2.5.2.tar.gz
 
@@ -444,7 +446,7 @@ popd
 
 rm -rf attr-2.5.2 
 
-################Acl-2.3.2.tar.xz##################
+###############Acl-2.3.2.tar.xz##################
 
 tar xvf acl-2.3.2.tar.xz
 
@@ -458,7 +460,7 @@ popd
 
 rm -rf acl-2.3.2
 
-#################Libcap-2.69##################
+################Libcap-2.69##################
 
 tar xvf libcap-2.69.tar.xz
 
@@ -470,7 +472,7 @@ popd
 
 rm -rf libcap-2.69
 
-#################Libxcrypt-4.4.36##################
+################Libxcrypt-4.4.36##################
 
 tar xvf libxcrypt-4.4.36.tar.xz
 
@@ -486,7 +488,7 @@ popd
 
 rm -rf libxcrypt-4.4.36
 
-#################Shadow-4.14.5.tar.xz##################
+################Shadow-4.14.5.tar.xz##################
 
 tar xvf shadow-4.14.5.tar.xz
 
@@ -517,15 +519,17 @@ pushd shadow-4.14.5
     mkdir -p /etc/default
     useradd -D --gid 999
     sed -i '/MAIL/s/yes/no/' /etc/default/useradd
-
-    # if u want to choose a password to root uncomment the next line
-    #passwd root
+cat << EOF > /tmp/rootpasswd
+root:root
+EOF
+    chpasswd < /tmp/rootpasswd
+    rm /tmp/rootpasswd
 
 popd
 
 rm -rf shadow-4.14.5
 
-################GCC-13.2.0 ##################
+###############GCC-13.2.0 ##################
 
 tar xvf gcc-13.2.0.tar.xz
 
@@ -551,7 +555,7 @@ pushd gcc-13.2.0
         make
         ulimit -s 32768
         chown -R tester .
-        ## Warning set -j<num of cores> to ur cores number
+        # Warning set -j<num of cores> to ur cores number
         ../contrib/test_summary
         make install
         chown -v -R root:root \
@@ -646,7 +650,7 @@ popd
 
 rm -rf gcc-13.2.0
 
-################Ncurses-6.4-20230520.tar.xz##################
+###############Ncurses-6.4-20230520.tar.xz##################
 
 tar xvf ncurses-6.4-20230520.tar.xz
 
@@ -673,29 +677,11 @@ pushd ncurses-6.4-20230520
     done
     ln -sfv libncursesw.so /usr/lib/libcurses.so
     cp -v -R doc -T /usr/share/doc/ncurses-6.4-20230520
-
-    # Les instructions ci-dessus ne créent pas de \
-    # bibliothèques Ncurses non-wide-character puisqu'aucun paquet \
-    # installé par la compilation à partir des sources ne se lie à elles lors de l'exécution. \
-    # Pour le moment, les seules applications binaires connues qui se lient aux bibliothèques Ncurses\
-    # non-wide-character exigent la version 5. Si vous devez avoir de telles bibliothèques à cause d'une\
-    # application disponible uniquement en binaire ou pour vous conformer à la LSB, compilez à nouveau le \
-    # paquet avec les commandes suivantes :
-
-    #     make distclean
-    #     ./configure --prefix=/usr    \
-    #                 --with-shared    \
-    #                 --without-normal \
-    #                 --without-debug  \
-    #                 --without-cxx-binding \
-    #                 --with-abi-version=5
-    #     make sources libs
-    #     cp -av lib/lib*.so.5* /usr/lib
 popd
 
-rm -rf ncurses-6.4-20230520.tar.xz
+rm -rf ncurses-6.4-20230520
 
-################Sed-4.9##################
+###############Sed-4.9##################
 
 tar xvf sed-4.9.tar.xz
 
@@ -712,7 +698,7 @@ popd
 
 rm -rf sed-4.9
 
-################Psmisc-23.6##################
+###############Psmisc-23.6##################
 
 tar xvf psmisc-23.6.tar.xz
 
@@ -724,7 +710,7 @@ popd
 
 rm -rf psmisc-23.6
 
-################Gettext-0.22.4.tar.xz##################
+###############Gettext-0.22.4.tar.xz##################
 
 tar xvf gettext-0.22.4.tar.xz
 
@@ -733,7 +719,6 @@ pushd gettext-0.22.4
             --disable-static \
             --docdir=/usr/share/doc/gettext-0.22.4
     make
-
     make install
     chmod -v 0755 /usr/lib/preloadable_libintl.so
 
@@ -741,7 +726,7 @@ popd
 
 rm -rf gettext-0.22.4
 
-################Bison-3.8.2##################
+###############Bison-3.8.2##################
 
 tar xvf bison-3.8.2.tar.xz
 
@@ -753,7 +738,7 @@ popd
 
 rm -rf bison-3.8.2
 
-################Grep-3.11##################
+###############Grep-3.11##################
 
 tar xvf grep-3.11.tar.xz
 
@@ -766,7 +751,7 @@ popd
 
 rm -rf grep-3.11
 
-################Bash-5.2.21##################
+###############Bash-5.2.21##################
 
 tar xvf bash-5.2.21.tar.gz
 
@@ -782,6 +767,6 @@ popd
 
 rm -rf bash-5.2.21
 
-exec /usr/bin/bash --login
-
 print_color "$TXT_YELLOW" "Fisrst Part of package Finish, Now just execute the second script"
+
+exec /usr/bin/bash --login

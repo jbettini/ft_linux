@@ -485,4 +485,4 @@ popd
 rm -rf gcc-13.2.0
 
 print_color "$TXT_GREEN" "PASS 2 - OK"
-print_color "$TXT_YELLOW" "Every Cross Compiling tools is sets, please disconnect from lfs user now"
+print_color "$TXT_YELLOW" "Every Cross Compiling tools is sets, please disconnect from lfs user"

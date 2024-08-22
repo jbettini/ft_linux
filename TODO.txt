@@ -1,0 +1,18 @@
+Ameliration
+
+Creation du disque
+partitionning du disque
+Recuperer la data du user au debut :
+-   type de clavier
+-   username
+
+automatisation de l'etape entre la preparation du system et l'instalation des toolchain
+
+automatiser le script qui cree des backup pour le rendre interactif avec le nom de la backup
+
+Cree un Workdir dans le chroot et un dans le host, inclure que les script neccessaire a l'un et l'autre 
+
+Automatiser toute les etape dans le chroot
+
+Ameliorer le script pour avoir internet en recuperant le nom de l'interface depuis le script
+
