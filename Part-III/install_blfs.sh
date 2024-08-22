@@ -332,7 +332,7 @@ rm -rf gdb-14.1
 ################ Linux-PAM-1.6.0 ################
 tar xvf Linux-PAM-1.6.0.tar.xz
 
-pushd 
+pushd Linux-PAM-1.6.0
     ./configure --prefix=/usr                        \
                 --sbindir=/usr/sbin                  \
                 --sysconfdir=/etc                    \
@@ -353,7 +353,7 @@ EOF
     chmod -v 4755 /usr/sbin/unix_chkpwd
 popd
 
-rm -rf 
+rm -rf Linux-PAM-1.6.0
 
 
 ################Shadow-4.14.5.tar.xz##################
