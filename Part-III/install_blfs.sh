@@ -278,6 +278,19 @@ popd
 
 rm -rf wget-1.21.4
 
+/usr/sbin/make-ca -g
+/usr/sbin/make-ca -r
+
+wget http://www.cacert.org/certs/root.crt &&
+wget http://www.cacert.org/certs/class3.crt &&
+openssl x509 -in root.crt -text -fingerprint -setalias "CAcert Class 1 root" \
+        -addtrust serverAuth -addtrust emailProtection -addtrust codeSigning \
+        > /etc/ssl/local/CAcert_Class_1_root.pem &&
+openssl x509 -in class3.crt -text -fingerprint -setalias "CAcert Class 3 root" \
+        -addtrust serverAuth -addtrust emailProtection -addtrust codeSigning \
+        > /etc/ssl/local/CAcert_Class_3_root.pem &&
+/usr/sbin/make-ca -r
+
 ################curl-8.6.0.tar.xz#################
 tar xvf curl-8.6.0.tar.xz
 
@@ -329,6 +342,8 @@ popd
 
 rm -rf gdb-14.1
 
+print_color "$TXT_GREEN" "Lets Backup"
+
 ################ Linux-PAM-1.6.0 ################
 tar xvf Linux-PAM-1.6.0.tar.xz
 
@@ -343,7 +358,7 @@ pushd Linux-PAM-1.6.0
     install -v -m755 -d /etc/pam.d &&
 
 cat > /etc/pam.d/other << "EOF"
-auth     required       pam_deny.so
+auth     required       pam_deny.so:
 account  required       pam_deny.so
 password required       pam_deny.so
 session  required       pam_deny.so
@@ -981,3 +996,8 @@ pushd fish-3.7.1
 popd
 
 rm -rf fish-3.7.1
+
+echo -e "/usr/local/bin/fish" >> /etc/shells 
+chsh -s /usr/local/bin/fish
+
+print_color "BLFS OK"
