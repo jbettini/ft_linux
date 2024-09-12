@@ -34,7 +34,7 @@ umount $LFS/{sys,proc,run,dev}
 
 pushd $LFS
   print_color "$TXT_BLUE" "Creating the backup..."
-  tar -cJpf $HOME/$name.tar.xz .
+  tar -cJzpf $HOME/$name.tar.xz .
 popd
 
 print_color "$TXT_BLUE" "reset chroot..."
